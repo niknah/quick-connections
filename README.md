@@ -14,5 +14,5 @@
 * Can be disabled in options under "Quick connections", "Circuit Board lines"
 
 
-## Can be used with litegraph only.  See example
+## Can be used with litegraph too.  See example
 

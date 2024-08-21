@@ -110,7 +110,8 @@ export class QuickConnection {
 	findAcceptingNodes(fromConnection, fromNode, findInput) {
 		const accepting = [];
 		const addToAccepting = (arr, node) => {
-			if (node.mode === 4) {
+			// eslint-disable-next-line eqeqeq
+			if (node.mode == 4) {
 				// bypassed
 				return;
 			}
