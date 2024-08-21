@@ -1,5 +1,5 @@
 
-![Example](imgs/CreaateSimple.gif)
+![Example](imgs/CreateSimple.gif)
 
 
 * Go to ComfyUI manager -> install with URL -> add the URL of this page.
