@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@comfyorg/litegraph": "^0.7.47",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "litegraph.js": "^0.7.18"
+  }
+}
