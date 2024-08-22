@@ -127,8 +127,8 @@ class MapLinks {
 			);
 
 			if (clipped === INSIDE) {
-				const centerX = (node.area[0] + (node.area[2] - node.area[0] / 2));
-				const centerY = (node.area[1] + (node.area[3] - node.area[1] / 2));
+				const centerX = (node.area[0] + ((node.area[2] - node.area[0]) / 2));
+				const centerY = (node.area[1] + ((node.area[3] - node.area[1]) / 2));
 				const dist = Math.sqrt(((centerX - outputXY[0]) ** 2) + ((centerY - outputXY[1]) ** 2));
 				if (dist < closestDistance) {
 					closest = {
