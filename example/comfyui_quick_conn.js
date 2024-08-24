@@ -4,7 +4,7 @@
 /* eslint camelcase:0 */
 /* eslint import/extensions: [0, {  <js>: "always"  }] */
 
-import { LGraph, LiteGraph, LGraphCanvas } from './comfyui_litegraph.js';
+import { LGraph, LiteGraph, LGraphCanvas } from './links/comfyui_litegraph.js';
 window.LGraph = LGraph;
 window.LiteGraph = LiteGraph;
 window.LGraphCanvas = LGraphCanvas;

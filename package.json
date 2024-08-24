@@ -1,4 +1,7 @@
 {
+	"scripts": {
+		"example": "bash example/run_example.sh"
+	},
   "dependencies": {
     "@comfyorg/litegraph": "^0.7.47",
     "eslint-config-airbnb-base": "^15.0.0",
