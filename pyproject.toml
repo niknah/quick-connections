@@ -1,0 +1,14 @@
+[project]
+name = "quick-connections"
+description = "Quick connections, Circuit board connections"
+version = "1.0.0"
+license = "MIT"
+
+[project.urls]
+Repository = "https://github.com/niknah/quick-connections"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = "niknah"
+DisplayName = "quick-connections"
+Icon = ""
