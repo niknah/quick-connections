@@ -4,7 +4,7 @@
 ![Example](imgs/CreateSimple.gif)
 
 
-* Go to ComfyUI manager -> install with URL -> add the URL of this page.
+* Go to [ComfyUI manager](https://github.com/ltdrdata/ComfyUI-Manager) -> look up "quick-connections"
 
 ## How to use...
 
@@ -15,5 +15,11 @@
 * Can be disabled in options under "Quick connections", "Circuit Board lines"
 
 
-## Can be used with litegraph too.  See example folder.  Use `python -m http.server` to run examples.
+## Can be used with litegraph too.  See example folder.  
+To run examples...
+```
+npm install
+python -m http.server
+# visit in browser: http://localhost:8000/example/quick_conn.html
+```
 
