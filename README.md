@@ -1,4 +1,5 @@
 
+Adds circuit board connections, quick connections to ComfyUI
 
 ![Example](imgs/CircuitBoardExample.webp)
 ![Example](imgs/CreateSimple.gif)
