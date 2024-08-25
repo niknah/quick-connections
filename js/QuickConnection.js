@@ -14,6 +14,7 @@ export class QuickConnection {
 		this.enabled = true;
 		// use inputs that already have a link to them.
 		this.useInputsWithLinks = false;
+		this.release_link_on_empty_shows_menu = true;
 	}
 
 	init() {
@@ -36,11 +37,14 @@ export class QuickConnection {
 			const origReleaseLink = LiteGraph.release_link_on_empty_shows_menu;
 			if (t.pointerUp()) {
 				LiteGraph.release_link_on_empty_shows_menu = false;
+				t.release_link_on_empty_shows_menu = false;
 			}
 			const ret = origProcessMouseUp.apply(this, arguments);
 			LiteGraph.release_link_on_empty_shows_menu = origReleaseLink;
+			t.release_link_on_empty_shows_menu = true;
 			return ret;
 		};
+
 
 		// ComfyUI has it's own version of litegraph.js
 		// https://github.com/Comfy-Org/litegraph.js
@@ -49,6 +53,14 @@ export class QuickConnection {
 	initListeners(canvas) {
 		this.graph = canvas.graph;
 		this.canvas = canvas;
+		this.canvas.canvas.addEventListener("litegraph:canvas",(e) => {
+			const detail = e.detail;
+			if(!this.release_link_on_empty_shows_menu
+				&& detail && detail.subType == 'empty-release'
+			) {
+				e.stopPropagation();
+			}
+		});
 
 		this.isComfyUI = this.canvas.connecting_links !== undefined ? true : false;
 
