@@ -77,6 +77,7 @@ export class QuickConnection {
 			if (connectingLink) {
 				return {
 					node: connectingLink.node,
+					slot: connectingLink.slot,
 					input: connectingLink.input,
 					output: connectingLink.output,
 				};
@@ -105,11 +106,11 @@ export class QuickConnection {
 				this.insideConnection.node.connect(
 					this.insideConnection.connection_slot_index,
 					connectionInfo.node,
-					this.canvas.connecting_input.slot_index,
+					connectionInfo.slot,
 				);
 			} else {
 				connectionInfo.node.connect(
-					connectionInfo.output.slot_index,
+					connectionInfo.slot,
 					this.insideConnection.node,
 					this.insideConnection.connection_slot_index,
 				);
@@ -188,15 +189,16 @@ export class QuickConnection {
 		const connectionInfo = this.getCurrentConnection();
 
 		if (connectionInfo) {
-			const { node, input, output } = connectionInfo;
+			const { node, input, output, slot } = connectionInfo;
 			const slotPos = new Float32Array(2);
 
 			// const isInput = this.canvas.connecting_input ? true : false;
 			// const connecting = isInput ? this.canvas.connecting_input : this.canvas.connecting_output;
 			const isInput = input ? true : false;
 			const connecting = isInput ? input : output;
+			const connectionSlot = slot;
 
-			const pos = node.getConnectionPos(isInput, connecting.slot_index, slotPos);
+			const pos = node.getConnectionPos(isInput, connectionSlot, slotPos);
 
 			if (!this.acceptingNodes) {
 				this.acceptingNodes = this.findAcceptingNodes(
