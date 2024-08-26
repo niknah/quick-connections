@@ -45,7 +45,6 @@ export class QuickConnection {
 			return ret;
 		};
 
-
 		// ComfyUI has it's own version of litegraph.js
 		// https://github.com/Comfy-Org/litegraph.js
 	}
@@ -53,10 +52,10 @@ export class QuickConnection {
 	initListeners(canvas) {
 		this.graph = canvas.graph;
 		this.canvas = canvas;
-		this.canvas.canvas.addEventListener("litegraph:canvas",(e) => {
-			const detail = e.detail;
-			if(!this.release_link_on_empty_shows_menu
-				&& detail && detail.subType == 'empty-release'
+		this.canvas.canvas.addEventListener('litegraph:canvas', (e) => {
+			const { detail } = e;
+			if (!this.release_link_on_empty_shows_menu
+				&& detail && detail.subType === 'empty-release'
 			) {
 				e.stopPropagation();
 			}
@@ -86,6 +85,7 @@ export class QuickConnection {
 			return {
 				node: this.canvas.connecting_node,
 				input: this.canvas.connecting_input,
+				slot: this.canvas.connecting_slot,
 				output: this.canvas.connecting_output,
 			};
 		}
@@ -189,11 +189,11 @@ export class QuickConnection {
 		const connectionInfo = this.getCurrentConnection();
 
 		if (connectionInfo) {
-			const { node, input, output, slot } = connectionInfo;
+			const {
+				node, input, output, slot,
+			} = connectionInfo;
 			const slotPos = new Float32Array(2);
 
-			// const isInput = this.canvas.connecting_input ? true : false;
-			// const connecting = isInput ? this.canvas.connecting_input : this.canvas.connecting_output;
 			const isInput = input ? true : false;
 			const connecting = isInput ? input : output;
 			const connectionSlot = slot;
@@ -239,7 +239,6 @@ export class QuickConnection {
 
 			// const oldFillStyle = ctx.fillStyle;
 			if (isInsideClosePosition) {
-				// for (let acceptingNode of this.acceptingNodes) {
 				this.acceptingNodes.filter((acceptingNode) => {
 					const isInsideRect = LiteGraph.isInsideRectangle(
 						mouseX,
@@ -279,12 +278,6 @@ export class QuickConnection {
 						ctx.lineTo(destPos[0], destPos[1]);
 						ctx.stroke();
 						ctx.closePath();
-
-						//					ctx.roundRect(
-						//						aNode.pos[0], aNode.pos[1]-LiteGraph.NODE_TITLE_HEIGHT,
-						//						aNode.size[0], aNode.size[1]+LiteGraph.NODE_TITLE_HEIGHT,
-						//						5
-						//					);
 					} else {
 						const slotColor =
 							this.canvas.default_connection_color_byType[acceptingNode.connection.type]
