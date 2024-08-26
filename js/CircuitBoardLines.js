@@ -154,52 +154,6 @@ class MapLinks {
 		return null;
 	}
 
-	/*
-	addPathsToNode(paths) {
-		paths.filter((path) => {
-			this.addPathToNode(path);
-			return false;
-		});
-	}
-
-	addPathToNodes(path) {
-		++this.lastPathId;
-		const len1 = path.length - 1;
-		const lineSpace2 = this.lineSpace / 2;
-		for (let p = 0; p < len1; ++p) {
-			const from = path[p];
-			const to = path[p + 1];
-			if (from[0] === to[0]) {
-				// horz
-				this.nodesByRight.push({
-					node: {
-						id: this.lastPathId,
-					},
-					area: [
-						from[0] - lineSpace2,
-						from[1],
-						from[0] + lineSpace2,
-						to[1],
-					],
-				});
-			} else if (from[1] === to[1]) {
-				// vert
-				this.nodesByRight.push({
-					node: {
-						id: this.lastPathId,
-					},
-					area: [
-						from[0],
-						from[1] - lineSpace2,
-						to[0],
-						to[1] + lineSpace2,
-					],
-				});
-			}
-		}
-	}
-	*/
-
 	mapFinalLink(outputXY, inputXY) {
 		const clipped = this.findClippedNode(outputXY, inputXY);
 		if (!clipped) {
@@ -360,13 +314,12 @@ class MapLinks {
 						: (linesArea[3]),
 				];
 			}
-
 			if (lastPathLocation[1] < outputXY[1]) {
 				linesArea[1] -= this.lineSpace;
-				lastPathLocation[1] -= this.lineSpace;
+				lastPathLocation[1] -= 1;
 			} else {
 				linesArea[3] += this.lineSpace;
-				lastPathLocation[1] += this.lineSpace;
+				lastPathLocation[1] += 1;
 			}
 			thisDirection = 'vert';
 		} else if (lastDirection !== 'vert') {
@@ -383,7 +336,6 @@ class MapLinks {
 				[outputXY[0], outputXY[1]],
 				[outputXY[0], vertEdge],
 			];
-
 			if (vertDistance <= 0) {
 				linesArea[3] += this.lineSpace;
 			} else {
@@ -414,10 +366,10 @@ class MapLinks {
 			}
 			if (lastPathLocation[0] < outputXY[0]) {
 				linesArea[0] -= this.lineSpace;
-				lastPathLocation[0] -= this.lineSpace;
+				// lastPathLocation[0] -= 1; //this.lineSpace;
 			} else {
 				linesArea[2] += this.lineSpace;
-				lastPathLocation[0] += this.lineSpace;
+				// lastPathLocation[0] += 1; //this.lineSpace;
 			}
 			thisDirection = 'horz';
 		} else {
@@ -564,7 +516,7 @@ class MapLinks {
 							if (pathFound && pathFound.length > 2) {
 								// mapLink() may have expanded the linesArea,
 								// lets put it back into the inputXY so the line is straight
-								inputXY[0] = nodeInfo.linesArea[0];
+								// inputXY[0] = nodeInfo.linesArea[0];
 								// this.addPathToNodes(pathFound);
 								path = [outputXYConnection, ...pathFound, inputXYConnection];
 								this.expandTargetNodeLinesArea(nodeInfo, path);

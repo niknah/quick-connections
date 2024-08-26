@@ -76,6 +76,28 @@ function addNodes() {
 	node_array.connect(0, node_bypass, 0);
 	node_array.connect(1, node_noise, 0);
 }
+
+function addNodes2() {
+	const node_const = LiteGraph.createNode('basic/const');
+	node_const.pos = [1350, 80];
+	graph.add(node_const);
+
+	const node_watch = LiteGraph.createNode('basic/watch');
+	node_watch.pos = [1450, 200];
+	graph.add(node_watch);
+	node_const.connect(0, node_watch, 0);
+
+	const node_const2 = LiteGraph.createNode('basic/const');
+	node_const2.pos = [1200, 180];
+	graph.add(node_const2);
+
+	const node_watch2 = LiteGraph.createNode('basic/watch');
+	node_watch2.pos = [1700, 180];
+	graph.add(node_watch2);
+	node_const2.connect(0, node_watch2, 0);
+}
+
 addNodes();
+addNodes2();
 
 graph.start();
