@@ -23,6 +23,7 @@ quickConnection.initListeners(canvas);
 circuitBoardLines.initOverrides(canvas);
 circuitBoardLines.debug = true;
 
+
 function addNodes() {
 	const node_const = LiteGraph.createNode('basic/const');
 	node_const.pos = [740, 200];
