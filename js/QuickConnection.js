@@ -211,13 +211,21 @@ export class QuickConnection {
 			const mouseX = this.canvas.graph_mouse[0];
 			const mouseY = this.canvas.graph_mouse[1];
 
+			// const hasNodeTooltip = document.querySelector('.node-tooltip');
+
 			const buttonShift = [
 				isInput ? -32 : +32,
-				this.acceptingNodes.length === 1
+				// force for now so the dots don't move around when the tooltip pops up.
+				0,
+				/*
+				(true || this.acceptingNodes.length === 1 || hasNodeTooltip)
 					? 0
-					: (-this.acceptingNodes.length / (2 * LiteGraph.NODE_SLOT_HEIGHT)),
+					: (
+						((-this.acceptingNodes.length * LiteGraph.NODE_SLOT_HEIGHT) / 2)
+						+ (LiteGraph.NODE_SLOT_HEIGHT / 2)
+					),
+					*/
 			];
-
 			const linkPos = [
 				pos[0] + buttonShift[0],
 				pos[1] + buttonShift[1],
