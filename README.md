@@ -5,7 +5,8 @@ Adds circuit board connections, quick connections to ComfyUI
 ![Example](imgs/CreateSimple.gif)
 
 
-* Go to [ComfyUI manager](https://github.com/ltdrdata/ComfyUI-Manager) -> look up "quick-connections"
+* To install, go to [ComfyUI manager](https://github.com/ltdrdata/ComfyUI-Manager) -> look up "quick-connections"
+* [Demo](https://niknah.github.io/quick-connections/quick_conn.html?nodebug=1)
 
 ## How to use...
 
