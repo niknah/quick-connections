@@ -4,8 +4,8 @@
 /* eslint camelcase:0 */
 /* eslint import/extensions: [0, {  <js>: "always"  }] */
 
-import { QuickConnection } from '../js/QuickConnection.js';
-import { CircuitBoardLines } from '../js/CircuitBoardLines.js';
+import { QuickConnection } from './QuickConnection.js';
+import { CircuitBoardLines } from './CircuitBoardLines.js';
 
 // LiteGraph.alt_drag_do_clone_nodes=true;
 

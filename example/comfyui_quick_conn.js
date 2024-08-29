@@ -10,8 +10,8 @@ window.LiteGraph = LiteGraph;
 window.LGraphCanvas = LGraphCanvas;
 
 
-import { QuickConnection } from '../js/QuickConnection.js';
-import { CircuitBoardLines } from '../js/CircuitBoardLines.js';
+import { QuickConnection } from './QuickConnection.js';
+import { CircuitBoardLines } from './CircuitBoardLines.js';
 
 // LiteGraph.alt_drag_do_clone_nodes=true;
 //
