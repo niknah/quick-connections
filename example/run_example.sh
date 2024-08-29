@@ -1,6 +1,6 @@
 
 
-mkdir example/links
+mkdir -p example/links
 pushd example/links
 ln -s ../../node_modules/@comfyorg/litegraph/dist/css/litegraph.css comfyui_litegraph.css
 ln -s ../../ext/litegraph.js/src/litegraph.js comfyui_litegraph.js
