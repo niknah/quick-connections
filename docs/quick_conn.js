@@ -1,1 +1,1 @@
-example/quick_conn.js
+../example/quick_conn.js
