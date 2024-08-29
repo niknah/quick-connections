@@ -457,16 +457,6 @@ class MapLinks {
 		this.nodesByRight = nodesByExecution.map((node) => {
 			const barea = new Float32Array(4);
 			node.getBounding(barea);
-			/*
-			const radius = this.canvas.round_radius;
-			const y = node.pos[1] - LiteGraph.NODE_TITLE_HEIGHT;
-			let area = [
-				node.pos[0] - radius / 2,
-				y - radius / 2,
-				node.pos[0] + node.size[0] + radius,
-				node.pos[1] + node.size[1] + radius,
-			];
-*/
 			const area = [
 				barea[0],
 				barea[1],
@@ -506,8 +496,6 @@ class MapLinks {
 				const outputNodeInfo = this.nodesById[node.id];
 				const outputXY = Array.from(outputXYConnection);
 				outputXY[0] = outputNodeInfo.linesArea[2];
-				// LiteGraph.NODE_SLOT_HEIGHT;
-				// outputXY[0] += this.lineSpace * 2;
 				output.links.filter((linkId) => {
 					const link = this.canvas.graph.links[linkId];
 					if (!link) {
@@ -524,7 +512,6 @@ class MapLinks {
 						inputLinkPos,
 					);
 					const inputXY = Array.from(inputXYConnection);
-					// inputXY[0] -= LiteGraph.NODE_SLOT_HEIGHT;
 					const nodeInfo = this.nodesById[targetNode.id];
 					inputXY[0] = nodeInfo.linesArea[0] - 1;
 
@@ -533,25 +520,6 @@ class MapLinks {
 					const outputBlockedByNode =
 						this.getNodeOnPos(outputXY);
 
-					// WARNING: getNodeOnPos does weird measurements.
-					// It adds +4 / -4 on the left right margins.
-					/*
-					const inputBlockedByNode =
-						this.canvas.graph.getNodeOnPos(
-							inputXY[0],
-							inputXY[1],
-							this.canvas.visible_nodes,
-							this.lineSpace / 2,
-						);
-					const outputBlockedByNode =
-						this.canvas.graph.getNodeOnPos(
-							outputXY[0],
-							outputXY[1],
-							this.canvas.visible_nodes,
-							this.lineSpace / 2,
-						);
-						*/
-
 					let path = null;
 					// console.log('blocked', inputBlockedByNode, outputBlockedByNode, 'inputXY', inputXY);
 					if (!inputBlockedByNode && !outputBlockedByNode) {
@@ -559,8 +527,6 @@ class MapLinks {
 						if (pathFound && pathFound.length > 2) {
 							// mapLink() may have expanded the linesArea,
 							// lets put it back into the inputXY so the line is straight
-							// inputXY[0] = nodeInfo.linesArea[0];
-							// this.addPathToNodes(pathFound);
 							path = [outputXYConnection, ...pathFound, inputXYConnection];
 							this.expandTargetNodeLinesArea(nodeInfo, path);
 						}
@@ -640,14 +606,9 @@ class MapLinks {
 					const yDiffAfter = nextPos[1] - cornerPos[1];
 					const isBeforeStraight = xDiffBefore === 0 || yDiffBefore === 0;
 					const isAfterStraight = xDiffAfter === 0 || yDiffAfter === 0;
-					// const isBefore45 = Math.abs(xDiffBefore) === Math.abs(yDiffBefore);
-					// const isAfter45 = Math.abs(xDiffAfter) === Math.abs(yDiffAfter);
-					// && cornerPos[0] === prevPos[0] && nextPos[1] === cornerPos[1]) {
 					// up/down -> left/right
 					if (
 						(isBeforeStraight || isAfterStraight)
-						// (isBeforeStraight || isBefore45)
-						// && (isAfterStraight || isAfter45)
 					) {
 						const beforePos = [
 							cornerPos[0],
@@ -671,7 +632,6 @@ class MapLinks {
 							afterPos[1] = cornerPos[1] + cornerRadius * ySignAfter;
 						}
 
-						// console.log('nnn', beforePos, cornerPos, afterPos);
 						ctx.lineTo(beforePos[0], beforePos[1]);
 						corners.push(cornerPos);
 						// ctx.lineTo(cornerPos[0], cornerPos[1]);
