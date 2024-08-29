@@ -231,9 +231,16 @@ export class QuickConnection {
 				pos[1] + buttonShift[1],
 			];
 
+			let scale = 1 / this.canvas.ds.scale;
+			if (scale < 1.0) {
+				scale = 1.0;
+			}
+
 			const linkCloseArea = [
 				linkPos[0] - LiteGraph.NODE_SLOT_HEIGHT * 2,
 				linkPos[1] - LiteGraph.NODE_SLOT_HEIGHT,
+				LiteGraph.NODE_SLOT_HEIGHT * 4 * scale,
+				LiteGraph.NODE_SLOT_HEIGHT * (this.acceptingNodes.length + 1) * scale,
 			];
 
 			const isInsideClosePosition = LiteGraph.isInsideRectangle(
@@ -241,12 +248,23 @@ export class QuickConnection {
 				mouseY,
 				linkCloseArea[0],
 				linkCloseArea[1],
-				LiteGraph.NODE_SLOT_HEIGHT * 4,
-				LiteGraph.NODE_SLOT_HEIGHT * (this.acceptingNodes.length + 1),
+				linkCloseArea[2],
+				linkCloseArea[3],
 			);
 
 			// const oldFillStyle = ctx.fillStyle;
 			if (isInsideClosePosition) {
+				const oldFont = ctx.font;
+				let font = oldFont;
+				const fontM = /([0-9]+)px/.exec(font);
+				if (!fontM) {
+					fontM[1] = 'px';
+					font += ' 12px';
+				}
+				if (fontM) {
+					const fontSize = parseInt(fontM[1], 10) * scale;
+					ctx.font = font.replace(/[0-9]+px/, `${fontSize}px`);
+				}
 				this.acceptingNodes.filter((acceptingNode) => {
 					const isInsideRect = LiteGraph.isInsideRectangle(
 						mouseX,
@@ -265,7 +283,7 @@ export class QuickConnection {
 						ctx.arc(
 							linkPos[0],
 							linkPos[1],
-							6,
+							6 * scale,
 							0,
 							Math.PI * 2,
 						);
@@ -294,7 +312,7 @@ export class QuickConnection {
 						ctx.fillStyle = slotColor || this.canvas.default_connection_color.input_on;
 						ctx.beginPath();
 
-						ctx.arc(linkPos[0], linkPos[1], 4, 0, Math.PI * 2);
+						ctx.arc(linkPos[0], linkPos[1], 4 * scale, 0, Math.PI * 2);
 						ctx.fill();
 						ctx.closePath();
 					}
@@ -335,9 +353,10 @@ export class QuickConnection {
 					ctx.fillStyle = LiteGraph.WIDGET_TEXT_COLOR;
 					ctx.fillText(acceptingText, textxy[0], textxy[1]);
 
-					linkPos[1] += LiteGraph.NODE_SLOT_HEIGHT;
+					linkPos[1] += LiteGraph.NODE_SLOT_HEIGHT * scale;
 					return false;
 				});
+				ctx.font = oldFont;
 			}
 		}
 		ctx.restore();
