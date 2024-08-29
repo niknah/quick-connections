@@ -566,7 +566,7 @@ class MapLinks {
 			console.log('paths', this.paths); // eslint-disable-line no-console
 
 		ctx.save();
-		const currentNodeId = this.canvas.current_node ? this.canvas.current_node.id : null;
+		const currentNodeIds = this.canvas.selected_nodes || {};
 		const corners = [];
 		this.paths.filter((pathI) => {
 			const path = pathI.path;
@@ -579,7 +579,7 @@ class MapLinks {
 				this.canvas.default_connection_color_byType[connection.type]
 				|| this.canvas.default_connection_color.input_on;
 
-			if (currentNodeId === pathI.node.id || currentNodeId === pathI.targetNode.id) {
+			if (currentNodeIds[pathI.node.id] || currentNodeIds[pathI.targetNode.id]) {
 				ctx.strokeStyle = 'white';
 			} else {
 				ctx.strokeStyle = slotColor;
