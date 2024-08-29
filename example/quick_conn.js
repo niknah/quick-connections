@@ -33,9 +33,10 @@ if (!params.get('nodebug')) {
 
 function addNodes() {
 	const node_const = LiteGraph.createNode('basic/const');
-	node_const.pos = [740, 200];
+	node_const.pos = [770, 250];
 	graph.add(node_const);
 	node_const.setValue(4.5);
+	node_const.collapse();
 
 	const node_watch = LiteGraph.createNode('basic/watch');
 	node_watch.pos = [580, 500];
