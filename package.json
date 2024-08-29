@@ -1,6 +1,7 @@
 {
 	"scripts": {
-		"example": "bash example/run_example.sh"
+		"example": "bash example/run_example.sh",
+		"docs": "bash example/make_docs.sh"
 	},
 	"dependencies": {
 		"@comfyorg/litegraph": "^0.7.47",
