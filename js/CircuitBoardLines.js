@@ -428,25 +428,51 @@ class MapLinks {
 		return true;
 	}
 
+	getNodeOnPos(xy) {
+		for (let i = 0; i < this.nodesByRight.length; ++i) {
+			const nodeI = this.nodesByRight[i];
+			const { linesArea } = nodeI;
+			if (xy[0] >= linesArea[0]
+				&& xy[1] >= linesArea[1]
+				&& xy[0] < linesArea[2]
+				&& xy[1] < linesArea[3]
+			) {
+				return nodeI;
+			}
+		}
+		return null;
+	}
+
 	mapLinks(nodesByExecution) {
 		const startCalcTime = new Date().getTime();
 		this.links = [];
 		this.lastPathId = 1000000;
-		this.nodesByRight = {};
+		this.nodesByRight = [];
 		this.nodesById = {};
 		this.nodesByRight = nodesByExecution.map((node) => {
+			const barea = new Float32Array(4);
+			node.getBounding(barea);
+			/*
 			const radius = this.canvas.round_radius;
 			const y = node.pos[1] - LiteGraph.NODE_TITLE_HEIGHT;
-			const area = [
+			let area = [
 				node.pos[0] - radius / 2,
 				y - radius / 2,
 				node.pos[0] + node.size[0] + radius,
 				node.pos[1] + node.size[1] + radius,
 			];
+*/
+			const area = [
+				barea[0],
+				barea[1],
+				barea[0] + barea[2],
+				barea[1] + barea[3],
+			];
 			const linesArea = Array.from(area);
 			linesArea[0] -= 5;
-			// this.lineSpace;
-			linesArea[2] += 1;
+			linesArea[1] -= 1;
+			linesArea[2] += 3;
+			linesArea[3] += 3;
 			const obj = {
 				node,
 				area,
@@ -490,10 +516,16 @@ class MapLinks {
 						const inputXY = Array.from(inputXYConnection);
 						// inputXY[0] -= LiteGraph.NODE_SLOT_HEIGHT;
 						const nodeInfo = this.nodesById[targetNode.id];
-						inputXY[0] = nodeInfo.linesArea[0];
+						inputXY[0] = nodeInfo.linesArea[0] - 1;
+
+						const inputBlockedByNode =
+							this.getNodeOnPos(inputXY);
+						const outputBlockedByNode =
+							this.getNodeOnPos(outputXY);
 
 						// WARNING: getNodeOnPos does weird measurements.
 						// It adds +4 / -4 on the left right margins.
+						/*
 						const inputBlockedByNode =
 							this.canvas.graph.getNodeOnPos(
 								inputXY[0],
@@ -508,6 +540,7 @@ class MapLinks {
 								this.canvas.visible_nodes,
 								this.lineSpace / 2,
 							);
+							*/
 
 						let path = null;
 						// console.log('blocked', inputBlockedByNode, outputBlockedByNode, 'inputXY', inputXY);
