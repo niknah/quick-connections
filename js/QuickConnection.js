@@ -52,14 +52,18 @@ export class QuickConnection {
 	initListeners(canvas) {
 		this.graph = canvas.graph;
 		this.canvas = canvas;
-		this.canvas.canvas.addEventListener('litegraph:canvas', (e) => {
-			const { detail } = e;
-			if (!this.release_link_on_empty_shows_menu
-				&& detail && detail.subType === 'empty-release'
-			) {
-				e.stopPropagation();
-			}
-		});
+		if (!this.canvas.canvas) {
+			console.error('no canvas', this.canvas); // eslint-disable-line no-console
+		} else {
+			this.canvas.canvas.addEventListener('litegraph:canvas', (e) => {
+				const { detail } = e;
+				if (!this.release_link_on_empty_shows_menu
+					&& detail && detail.subType === 'empty-release'
+				) {
+					e.stopPropagation();
+				}
+			});
+		}
 
 		this.isComfyUI = this.canvas.connecting_links !== undefined ? true : false;
 
@@ -178,6 +182,10 @@ export class QuickConnection {
 
 	onDrawOverlay(ctx) {
 		if (!this.enabled) {
+			return;
+		}
+		if (!this.canvas || !this.canvas.graph_mouse) {
+			console.error('no canvas or mouse yet', this.canvas); // eslint-disable-line no-console
 			return;
 		}
 
