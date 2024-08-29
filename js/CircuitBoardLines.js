@@ -444,6 +444,11 @@ class MapLinks {
 	}
 
 	mapLinks(nodesByExecution) {
+		if (!this.canvas.graph.links) {
+			console.error('Missing graph.links', this.canvas.graph); // eslint-disable-line no-console
+			return;
+		}
+
 		const startCalcTime = new Date().getTime();
 		this.links = [];
 		this.lastPathId = 1000000;
@@ -505,67 +510,71 @@ class MapLinks {
 				// outputXY[0] += this.lineSpace * 2;
 				output.links.filter((linkId) => {
 					const link = this.canvas.graph.links[linkId];
-					if (link) {
-						const targetNode = this.canvas.graph.getNodeById(link.target_id);
-						const inputLinkPos = new Float32Array(2);
-						const inputXYConnection = targetNode.getConnectionPos(
-							true,
-							link.target_slot,
-							inputLinkPos,
-						);
-						const inputXY = Array.from(inputXYConnection);
-						// inputXY[0] -= LiteGraph.NODE_SLOT_HEIGHT;
-						const nodeInfo = this.nodesById[targetNode.id];
-						inputXY[0] = nodeInfo.linesArea[0] - 1;
-
-						const inputBlockedByNode =
-							this.getNodeOnPos(inputXY);
-						const outputBlockedByNode =
-							this.getNodeOnPos(outputXY);
-
-						// WARNING: getNodeOnPos does weird measurements.
-						// It adds +4 / -4 on the left right margins.
-						/*
-						const inputBlockedByNode =
-							this.canvas.graph.getNodeOnPos(
-								inputXY[0],
-								inputXY[1],
-								this.canvas.visible_nodes,
-								this.lineSpace / 2,
-							);
-						const outputBlockedByNode =
-							this.canvas.graph.getNodeOnPos(
-								outputXY[0],
-								outputXY[1],
-								this.canvas.visible_nodes,
-								this.lineSpace / 2,
-							);
-							*/
-
-						let path = null;
-						// console.log('blocked', inputBlockedByNode, outputBlockedByNode, 'inputXY', inputXY);
-						if (!inputBlockedByNode && !outputBlockedByNode) {
-							const pathFound = this.mapLink(outputXY, inputXY, nodeInfo, {}, null);
-							if (pathFound && pathFound.length > 2) {
-								// mapLink() may have expanded the linesArea,
-								// lets put it back into the inputXY so the line is straight
-								// inputXY[0] = nodeInfo.linesArea[0];
-								// this.addPathToNodes(pathFound);
-								path = [outputXYConnection, ...pathFound, inputXYConnection];
-								this.expandTargetNodeLinesArea(nodeInfo, path);
-							}
-						}
-						if (!path) {
-							path = [outputXYConnection, outputXY, inputXY, inputXYConnection];
-						}
-						this.expandSourceNodeLinesArea(nodeI, path);
-						this.paths.push({
-							path,
-							node,
-							targetNode,
-							slot,
-						});
+					if (!link) {
+						return false;
 					}
+					const targetNode = this.canvas.graph.getNodeById(link.target_id);
+					if (!targetNode) {
+						return false;
+					}
+					const inputLinkPos = new Float32Array(2);
+					const inputXYConnection = targetNode.getConnectionPos(
+						true,
+						link.target_slot,
+						inputLinkPos,
+					);
+					const inputXY = Array.from(inputXYConnection);
+					// inputXY[0] -= LiteGraph.NODE_SLOT_HEIGHT;
+					const nodeInfo = this.nodesById[targetNode.id];
+					inputXY[0] = nodeInfo.linesArea[0] - 1;
+
+					const inputBlockedByNode =
+						this.getNodeOnPos(inputXY);
+					const outputBlockedByNode =
+						this.getNodeOnPos(outputXY);
+
+					// WARNING: getNodeOnPos does weird measurements.
+					// It adds +4 / -4 on the left right margins.
+					/*
+					const inputBlockedByNode =
+						this.canvas.graph.getNodeOnPos(
+							inputXY[0],
+							inputXY[1],
+							this.canvas.visible_nodes,
+							this.lineSpace / 2,
+						);
+					const outputBlockedByNode =
+						this.canvas.graph.getNodeOnPos(
+							outputXY[0],
+							outputXY[1],
+							this.canvas.visible_nodes,
+							this.lineSpace / 2,
+						);
+						*/
+
+					let path = null;
+					// console.log('blocked', inputBlockedByNode, outputBlockedByNode, 'inputXY', inputXY);
+					if (!inputBlockedByNode && !outputBlockedByNode) {
+						const pathFound = this.mapLink(outputXY, inputXY, nodeInfo, {}, null);
+						if (pathFound && pathFound.length > 2) {
+							// mapLink() may have expanded the linesArea,
+							// lets put it back into the inputXY so the line is straight
+							// inputXY[0] = nodeInfo.linesArea[0];
+							// this.addPathToNodes(pathFound);
+							path = [outputXYConnection, ...pathFound, inputXYConnection];
+							this.expandTargetNodeLinesArea(nodeInfo, path);
+						}
+					}
+					if (!path) {
+						path = [outputXYConnection, outputXY, inputXY, inputXYConnection];
+					}
+					this.expandSourceNodeLinesArea(nodeI, path);
+					this.paths.push({
+						path,
+						node,
+						targetNode,
+						slot,
+					});
 					return false;
 				});
 				return false;
@@ -583,6 +592,10 @@ class MapLinks {
 	}
 
 	drawLinks(ctx) {
+		if (!this.canvas.default_connection_color_byType || !this.canvas.default_connection_color) {
+			console.error('Missing canvas.default_connection_color_byType', this.canvas); // eslint-disable-line no-console
+			return;
+		}
 		if (this.debug)
 			console.log('paths', this.paths); // eslint-disable-line no-console
 
@@ -778,7 +791,7 @@ export class CircuitBoardLines {
 	recalcMapLinks() {
 		this.mapLinks = new MapLinks(this.canvas);
 		this.mapLinks.debug = this.debug;
-		const nodesByExecution = this.canvas.graph.computeExecutionOrder();
+		const nodesByExecution = this.canvas.graph.computeExecutionOrder() || [];
 		this.mapLinks.mapLinks(nodesByExecution);
 	}
 
