@@ -1,7 +1,7 @@
 [project]
 name = "quick-connections"
 description = "Quick connections, Circuit board connections"
-version = "1.0.5"
+version = "1.0.6"
 license = {text = "MIT License"}
 
 [project.urls]
