@@ -494,7 +494,7 @@ class MapLinks {
 				const linkPos = new Float32Array(2);
 				const outputXYConnection = node.getConnectionPos(false, slot, linkPos);
 				const outputNodeInfo = this.nodesById[node.id];
-				const outputXY = Array.from(outputXYConnection);
+				let outputXY = Array.from(outputXYConnection);
 				outputXY[0] = outputNodeInfo.linesArea[2];
 				output.links.filter((linkId) => {
 					const link = this.canvas.graph.links[linkId];
@@ -505,6 +505,7 @@ class MapLinks {
 					if (!targetNode) {
 						return false;
 					}
+
 					const inputLinkPos = new Float32Array(2);
 					const inputXYConnection = targetNode.getConnectionPos(
 						true,
@@ -541,6 +542,10 @@ class MapLinks {
 						targetNode,
 						slot,
 					});
+					outputXY = [
+						outputXY[0] + this.lineSpace,
+						outputXY[1],
+					];
 					return false;
 				});
 				return false;
