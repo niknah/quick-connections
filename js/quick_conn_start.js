@@ -19,14 +19,31 @@ const ext = {
 		quickConnection.initListeners(app.canvas);
 		circuitBoardLines.initOverrides(app.canvas);
 
-		const quickConnectionId = "quick-connections.enable";
+		const quickConnectionId = "quick-connections";
+		const quickConnectionEnableId = `${quickConnectionId}.enable`;
 		app.ui.settings.addSetting({
-			id: quickConnectionId,
+			id: quickConnectionEnableId,
 			name: "Quick connections enable",
 			type: "boolean",
 			defaultValue: true,
 			onChange: (...args) => {
-				quickConnection.enabled = app.ui.settings.getSettingValue(quickConnectionId, true);
+				quickConnection.enabled = app.ui.settings.getSettingValue(quickConnectionEnableId, true);
+				return app.graph.change.apply(app.graph, args);
+			},
+		});
+		const quickConnectionDotOnlyId = `${quickConnectionId}.connectDotOnly`;
+		app.ui.settings.addSetting({
+			id: quickConnectionDotOnlyId,
+			category: [quickConnectionId, "enable", "connectDotOnly"],
+			name: "Connect with dot",
+			tooltip: "Disable to connect with text too, a bigger area to release the mouse button",
+			type: "boolean",
+			defaultValue: true,
+			onChange: (...args) => {
+				quickConnection.connectDotOnly = app.ui.settings.getSettingValue(
+					quickConnectionDotOnlyId,
+					true,
+				);
 				return app.graph.change.apply(app.graph, args);
 			},
 		});

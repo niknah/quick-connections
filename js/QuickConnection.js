@@ -15,6 +15,7 @@ export class QuickConnection {
 		// use inputs that already have a link to them.
 		this.useInputsWithLinks = false;
 		this.release_link_on_empty_shows_menu = true;
+		this.connectDotOnly = true;
 	}
 
 	init() {
@@ -307,6 +308,8 @@ export class QuickConnection {
 						box[2] + 16 * scale,
 						box[3] + 5 * scale,
 					];
+					const oldAlpha = ctx.globalAlpha;
+					ctx.globalAlpha = 0.75;
 					ctx.roundRect(
 						rRect[0],
 						rRect[1],
@@ -316,20 +319,33 @@ export class QuickConnection {
 					);
 					ctx.fill();
 					ctx.closePath();
+					ctx.globalAlpha = oldAlpha;
 
 					ctx.fillStyle = LiteGraph.WIDGET_TEXT_COLOR;
 					ctx.fillText(acceptingText, textxy[0], textxy[1]);
 
-					const isInsideRect = LiteGraph.isInsideRectangle(
-						mouseX,
-						mouseY,
-						isInput ? box[0] : linkPos[0],
-						linkPos[1] - 10,
-						isInput ?
-							(linkPos[0] + LiteGraph.NODE_SLOT_HEIGHT)
-							: (rRect[2] + LiteGraph.NODE_SLOT_HEIGHT),
-						rRect[3],
-					);
+					let isInsideRect;
+					if (this.connectDotOnly) {
+						isInsideRect = LiteGraph.isInsideRectangle(
+							mouseX,
+							mouseY,
+							linkPos[0] - ((LiteGraph.NODE_SLOT_HEIGHT / 2) * scale),
+							linkPos[1] - ((LiteGraph.NODE_SLOT_HEIGHT / 2) * scale),
+							LiteGraph.NODE_SLOT_HEIGHT * scale,
+							LiteGraph.NODE_SLOT_HEIGHT * scale,
+						);
+					} else {
+						isInsideRect = LiteGraph.isInsideRectangle(
+							mouseX,
+							mouseY,
+							isInput ? box[0] : linkPos[0],
+							linkPos[1] - 10,
+							isInput ?
+								(linkPos[0] + LiteGraph.NODE_SLOT_HEIGHT)
+								: (rRect[2] + LiteGraph.NODE_SLOT_HEIGHT),
+							rRect[3],
+						);
+					}
 
 					if (isInsideRect && !this.insideConnection) {
 						this.insideConnection = acceptingNode;
