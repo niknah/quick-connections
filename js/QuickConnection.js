@@ -398,20 +398,22 @@ export class QuickConnection {
 					return false;
 				});
 
-				ctx.beginPath();
-				ctx.fillStyle = this.boxBackground;
-				const oldAlpha = ctx.globalAlpha;
-				ctx.globalAlpha = this.boxAlpha;
-				ctx.roundRect(
-					boxRect[0],
-					boxRect[1],
-					boxRect[2],
-					boxRect[3],
-					5,
-				);
-				ctx.fill();
-				ctx.closePath();
-				ctx.globalAlpha = oldAlpha;
+				if (boxRect) {
+					ctx.beginPath();
+					ctx.fillStyle = this.boxBackground;
+					const oldAlpha = ctx.globalAlpha;
+					ctx.globalAlpha = this.boxAlpha;
+					ctx.roundRect(
+						boxRect[0],
+						boxRect[1],
+						boxRect[2],
+						boxRect[3],
+						5,
+					);
+					ctx.fill();
+					ctx.closePath();
+					ctx.globalAlpha = oldAlpha;
+				}
 
 				ctx.fillStyle = LiteGraph.WIDGET_TEXT_COLOR;
 				textsToDraw.filter((textToDraw) => {
