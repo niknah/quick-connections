@@ -351,7 +351,7 @@ class MapLinks {
 
 			lastPathLocation = [
 				horzDistanceViaBlockLeft <= horzDistanceViaBlockRight ?
-					(linesArea[0])
+					(linesArea[0]-1)
 					: (linesArea[2]),
 				vertEdge,
 			];
