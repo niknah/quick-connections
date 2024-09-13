@@ -16,6 +16,9 @@ export class QuickConnection {
 		this.useInputsWithLinks = false;
 		this.release_link_on_empty_shows_menu = true;
 		this.connectDotOnly = true;
+		this.doNotAcceptType = /^\*$/;
+		this.boxAlpha = 0.7;
+		this.boxBackground = '#000';
 	}
 
 	init() {
@@ -144,7 +147,7 @@ export class QuickConnection {
 						input.type,
 						fromConnection.type,
 					);
-					if (accept) {
+					if (accept && !this.doNotAcceptType.exec(input.type)) {
 						accepting.push({
 							node,
 							connection: input,
