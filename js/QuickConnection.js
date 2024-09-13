@@ -229,7 +229,8 @@ export class QuickConnection {
 			const buttonShift = [
 				isInput ? -32 : +32,
 				// force for now so the dots don't move around when the tooltip pops up.
-				0,
+				// No need to avoid tool tip if we're using the input, tool tip is visible to the right of dot
+				isInput ? 0 : LiteGraph.NODE_SLOT_HEIGHT,
 				/*
 				(true || this.acceptingNodes.length === 1 || hasNodeTooltip)
 					? 0
@@ -267,6 +268,8 @@ export class QuickConnection {
 				linkCloseArea[2],
 				linkCloseArea[3],
 			);
+			let boxRect = null;
+			const textsToDraw = [];
 
 			// const oldFillStyle = ctx.fillStyle;
 			if (isInsideClosePosition) {
@@ -293,39 +296,37 @@ export class QuickConnection {
 						textxy[0],
 						textxy[1] - textBox.fontBoundingBoxAscent,
 						textBox.width,
-						(textBox.fontBoundingBoxAscent + textBox.fontBoundingBoxDescent),
+						LiteGraph.NODE_SLOT_HEIGHT,
+						// (textBox.fontBoundingBoxAscent + textBox.fontBoundingBoxDescent),
 					];
 
+					let textAlign;
 					if (!isInput) {
-						ctx.textAlign = 'left';
+						textAlign = 'left';
 					} else {
 						box[0] -= textBox.width;
-						ctx.textAlign = 'right';
+						textAlign = 'right';
 					}
 
-					ctx.beginPath();
-					ctx.fillStyle = LiteGraph.NODE_DEFAULT_BGCOLOR;
 					const rRect = [
 						box[0] - 8 * scale,
 						box[1] - 4 * scale,
 						box[2] + 16 * scale,
-						box[3] + 5 * scale,
+						box[3], // + 5 * scale,
 					];
-					const oldAlpha = ctx.globalAlpha;
-					ctx.globalAlpha = 0.75;
-					ctx.roundRect(
-						rRect[0],
-						rRect[1],
-						rRect[2],
-						rRect[3],
-						5,
-					);
-					ctx.fill();
-					ctx.closePath();
-					ctx.globalAlpha = oldAlpha;
+					if (!boxRect) {
+						boxRect = rRect.slice(0);
+					} else {
+						if (boxRect[0] > rRect[0]) {
+							boxRect[0] = rRect[0];
+						}
+						if (boxRect[2] < rRect[2]) {
+							boxRect[2] = rRect[2];
+						}
+						boxRect[3] += rRect[3];
+					}
 
-					ctx.fillStyle = LiteGraph.WIDGET_TEXT_COLOR;
-					ctx.fillText(acceptingText, textxy[0], textxy[1]);
+					textsToDraw.push({x:textxy[0], y:textxy[1], acceptingText, textAlign});
 
 					let isInsideRect;
 					if (this.connectDotOnly) {
@@ -396,6 +397,29 @@ export class QuickConnection {
 					linkPos[1] += LiteGraph.NODE_SLOT_HEIGHT * scale;
 					return false;
 				});
+
+				ctx.beginPath();
+				ctx.fillStyle = this.boxBackground;
+				const oldAlpha = ctx.globalAlpha;
+				ctx.globalAlpha = this.boxAlpha;
+				ctx.roundRect(
+					boxRect[0],
+					boxRect[1],
+					boxRect[2],
+					boxRect[3],
+					5,
+				);
+				ctx.fill();
+				ctx.closePath();
+				ctx.globalAlpha = oldAlpha;
+
+				ctx.fillStyle = LiteGraph.WIDGET_TEXT_COLOR;
+				textsToDraw.filter((textToDraw) => {
+					ctx.textAlign = textToDraw.textAlign;
+					ctx.fillText(textToDraw.acceptingText, textToDraw.x, textToDraw.y);
+				});
+
+
 				ctx.font = oldFont;
 			}
 		}
