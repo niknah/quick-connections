@@ -346,11 +346,11 @@ export class QuickConnection {
 						isInsideRect = LiteGraph.isInsideRectangle(
 							mouseX,
 							mouseY,
-							isInput ? box[0] : linkPos[0],
+							isInput ? box[0] : (linkPos[0] - (LiteGraph.NODE_SLOT_HEIGHT/2) ),
 							linkPos[1] - 10,
 							isInput ?
-								(linkPos[0] + LiteGraph.NODE_SLOT_HEIGHT)
-								: (rRect[2] + LiteGraph.NODE_SLOT_HEIGHT),
+								((linkPos[0] - box[0]) + LiteGraph.NODE_SLOT_HEIGHT/2 )
+								: (rRect[2] + LiteGraph.NODE_SLOT_HEIGHT/2 ),
 							rRect[3],
 						);
 					}
