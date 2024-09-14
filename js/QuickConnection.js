@@ -130,6 +130,10 @@ export class QuickConnection {
 
 	findAcceptingNodes(fromConnection, fromNode, findInput) {
 		const accepting = [];
+		if (this.doNotAcceptType.exec(fromConnection.type)) {
+			// Too many connections are available if we area a * connection
+			return accepting;
+		}
 		const addToAccepting = (arr, node) => {
 			// eslint-disable-next-line eqeqeq
 			if (node.mode == 4) {
