@@ -33,7 +33,7 @@ if (!params.get('nodebug')) {
 
 function addNodes() {
 	const node_const = LiteGraph.createNode('basic/const');
-	node_const.pos = [770, 250];
+	node_const.pos = [770, 200];
 	graph.add(node_const);
 	node_const.setValue(4.5);
 	node_const.collapse();
@@ -42,6 +42,11 @@ function addNodes() {
 	node_watch.pos = [580, 500];
 	graph.add(node_watch);
 	node_const.connect(0, node_watch, 0);
+
+	const node_mathCompare = LiteGraph.createNode('math/compare');
+	node_mathCompare.pos = [800, 400];
+	graph.add(node_mathCompare);
+	node_const.connect(0, node_mathCompare, 0);
 
 	const node_string = LiteGraph.createNode('basic/string');
 	node_string.pos = [200, 230];

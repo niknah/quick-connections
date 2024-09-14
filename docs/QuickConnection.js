@@ -15,6 +15,10 @@ export class QuickConnection {
 		// use inputs that already have a link to them.
 		this.useInputsWithLinks = false;
 		this.release_link_on_empty_shows_menu = true;
+		this.connectDotOnly = true;
+		this.doNotAcceptType = /^\*$/;
+		this.boxAlpha = 0.7;
+		this.boxBackground = '#000';
 	}
 
 	init() {
@@ -52,14 +56,18 @@ export class QuickConnection {
 	initListeners(canvas) {
 		this.graph = canvas.graph;
 		this.canvas = canvas;
-		this.canvas.canvas.addEventListener('litegraph:canvas', (e) => {
-			const { detail } = e;
-			if (!this.release_link_on_empty_shows_menu
-				&& detail && detail.subType === 'empty-release'
-			) {
-				e.stopPropagation();
-			}
-		});
+		if (!this.canvas.canvas) {
+			console.error('no canvas', this.canvas); // eslint-disable-line no-console
+		} else {
+			this.canvas.canvas.addEventListener('litegraph:canvas', (e) => {
+				const { detail } = e;
+				if (!this.release_link_on_empty_shows_menu
+					&& detail && detail.subType === 'empty-release'
+				) {
+					e.stopPropagation();
+				}
+			});
+		}
 
 		this.isComfyUI = this.canvas.connecting_links !== undefined ? true : false;
 
@@ -122,6 +130,10 @@ export class QuickConnection {
 
 	findAcceptingNodes(fromConnection, fromNode, findInput) {
 		const accepting = [];
+		if (this.doNotAcceptType.exec(fromConnection.type)) {
+			// Too many connections are available if we area a * connection
+			return accepting;
+		}
 		const addToAccepting = (arr, node) => {
 			// eslint-disable-next-line eqeqeq
 			if (node.mode == 4) {
@@ -139,7 +151,7 @@ export class QuickConnection {
 						input.type,
 						fromConnection.type,
 					);
-					if (accept) {
+					if (accept && !this.doNotAcceptType.exec(input.type)) {
 						accepting.push({
 							node,
 							connection: input,
@@ -180,6 +192,10 @@ export class QuickConnection {
 		if (!this.enabled) {
 			return;
 		}
+		if (!this.canvas || !this.canvas.graph_mouse) {
+			console.error('no canvas or mouse yet', this.canvas); // eslint-disable-line no-console
+			return;
+		}
 
 		ctx.save();
 		this.canvas.ds.toCanvasContext(ctx);
@@ -208,6 +224,7 @@ export class QuickConnection {
 					!isInput,
 				);
 			}
+
 			const mouseX = this.canvas.graph_mouse[0];
 			const mouseY = this.canvas.graph_mouse[1];
 
@@ -216,7 +233,8 @@ export class QuickConnection {
 			const buttonShift = [
 				isInput ? -32 : +32,
 				// force for now so the dots don't move around when the tooltip pops up.
-				0,
+				// No need to avoid tool tip if we're using the input, tool tip is visible to the right of dot
+				isInput ? 0 : LiteGraph.NODE_SLOT_HEIGHT,
 				/*
 				(true || this.acceptingNodes.length === 1 || hasNodeTooltip)
 					? 0
@@ -237,11 +255,14 @@ export class QuickConnection {
 			}
 
 			const linkCloseArea = [
-				linkPos[0] - LiteGraph.NODE_SLOT_HEIGHT * 2,
+				linkPos[0] - (LiteGraph.NODE_SLOT_HEIGHT * 6 * scale),
 				linkPos[1] - LiteGraph.NODE_SLOT_HEIGHT,
-				LiteGraph.NODE_SLOT_HEIGHT * 4 * scale,
+				LiteGraph.NODE_SLOT_HEIGHT * 8 * scale,
 				LiteGraph.NODE_SLOT_HEIGHT * (this.acceptingNodes.length + 1) * scale,
 			];
+			if (!isInput) {
+				linkCloseArea[0] = linkPos[0] - ((LiteGraph.NODE_SLOT_HEIGHT * 2) * scale);
+			}
 
 			const isInsideClosePosition = LiteGraph.isInsideRectangle(
 				mouseX,
@@ -251,6 +272,8 @@ export class QuickConnection {
 				linkCloseArea[2],
 				linkCloseArea[3],
 			);
+			let boxRect = null;
+			const textsToDraw = [];
 
 			// const oldFillStyle = ctx.fillStyle;
 			if (isInsideClosePosition) {
@@ -266,16 +289,73 @@ export class QuickConnection {
 					ctx.font = font.replace(/[0-9]+px/, `${fontSize}px`);
 				}
 				this.acceptingNodes.filter((acceptingNode) => {
-					const isInsideRect = LiteGraph.isInsideRectangle(
-						mouseX,
-						mouseY,
-						linkPos[0] - 5,
-						linkPos[1] - 10,
-						10,
-						20,
-					);
+					const textxy = [
+						linkPos[0] + (isInput ? -LiteGraph.NODE_SLOT_HEIGHT : LiteGraph.NODE_SLOT_HEIGHT),
+						linkPos[1],
+					];
 
-					if (isInsideRect) {
+					const acceptingText = `${acceptingNode.connection.name} @${acceptingNode.node.title}`;
+					const textBox = ctx.measureText(acceptingText);
+					const box = [
+						textxy[0],
+						textxy[1] - textBox.fontBoundingBoxAscent,
+						textBox.width,
+						LiteGraph.NODE_SLOT_HEIGHT,
+						// (textBox.fontBoundingBoxAscent + textBox.fontBoundingBoxDescent),
+					];
+
+					let textAlign;
+					if (!isInput) {
+						textAlign = 'left';
+					} else {
+						box[0] -= textBox.width;
+						textAlign = 'right';
+					}
+
+					const rRect = [
+						box[0] - 8 * scale,
+						box[1] - 4 * scale,
+						box[2] + 16 * scale,
+						box[3], // + 5 * scale,
+					];
+					if (!boxRect) {
+						boxRect = rRect.slice(0);
+					} else {
+						if (boxRect[0] > rRect[0]) {
+							boxRect[0] = rRect[0];
+						}
+						if (boxRect[2] < rRect[2]) {
+							boxRect[2] = rRect[2];
+						}
+						boxRect[3] += rRect[3];
+					}
+
+					textsToDraw.push({x:textxy[0], y:textxy[1], acceptingText, textAlign});
+
+					let isInsideRect;
+					if (this.connectDotOnly) {
+						isInsideRect = LiteGraph.isInsideRectangle(
+							mouseX,
+							mouseY,
+							linkPos[0] - ((LiteGraph.NODE_SLOT_HEIGHT / 2) * scale),
+							linkPos[1] - ((LiteGraph.NODE_SLOT_HEIGHT / 2) * scale),
+							LiteGraph.NODE_SLOT_HEIGHT * scale,
+							LiteGraph.NODE_SLOT_HEIGHT * scale,
+						);
+					} else {
+						isInsideRect = LiteGraph.isInsideRectangle(
+							mouseX,
+							mouseY,
+							isInput ? box[0] : (linkPos[0] - (LiteGraph.NODE_SLOT_HEIGHT/2) ),
+							linkPos[1] - 10,
+							isInput ?
+								((linkPos[0] - box[0]) + LiteGraph.NODE_SLOT_HEIGHT/2 )
+								: (rRect[2] + LiteGraph.NODE_SLOT_HEIGHT/2 ),
+							rRect[3],
+						);
+					}
+
+					if (isInsideRect && !this.insideConnection) {
 						this.insideConnection = acceptingNode;
 						ctx.fillStyle = LiteGraph.EVENT_LINK_COLOR; // "#ffcc00";
 						// highlight destination if mouseover
@@ -317,45 +397,35 @@ export class QuickConnection {
 						ctx.closePath();
 					}
 
-					const textxy = [
-						linkPos[0] + (isInput ? -LiteGraph.NODE_SLOT_HEIGHT : LiteGraph.NODE_SLOT_HEIGHT),
-						linkPos[1],
-					];
-
-					const acceptingText = `${acceptingNode.connection.name} @${acceptingNode.node.title}`;
-					const textBox = ctx.measureText(acceptingText);
-					const box = [
-						textxy[0],
-						textxy[1] - textBox.fontBoundingBoxAscent,
-						textBox.width,
-						textBox.fontBoundingBoxAscent + textBox.fontBoundingBoxDescent,
-					];
-
-					if (!isInput) {
-						ctx.textAlign = 'left';
-					} else {
-						box[0] -= textBox.width;
-						ctx.textAlign = 'right';
-					}
-
-					ctx.beginPath();
-					ctx.fillStyle = LiteGraph.NODE_DEFAULT_BGCOLOR;
-					ctx.roundRect(
-						box[0] - 8,
-						box[1] - 4,
-						box[2] + 16,
-						box[3] + 8,
-						5,
-					);
-					ctx.fill();
-					ctx.closePath();
-
-					ctx.fillStyle = LiteGraph.WIDGET_TEXT_COLOR;
-					ctx.fillText(acceptingText, textxy[0], textxy[1]);
 
 					linkPos[1] += LiteGraph.NODE_SLOT_HEIGHT * scale;
 					return false;
 				});
+
+				if (boxRect) {
+					ctx.beginPath();
+					ctx.fillStyle = this.boxBackground;
+					const oldAlpha = ctx.globalAlpha;
+					ctx.globalAlpha = this.boxAlpha;
+					ctx.roundRect(
+						boxRect[0],
+						boxRect[1],
+						boxRect[2],
+						boxRect[3],
+						5,
+					);
+					ctx.fill();
+					ctx.closePath();
+					ctx.globalAlpha = oldAlpha;
+				}
+
+				ctx.fillStyle = LiteGraph.WIDGET_TEXT_COLOR;
+				textsToDraw.filter((textToDraw) => {
+					ctx.textAlign = textToDraw.textAlign;
+					ctx.fillText(textToDraw.acceptingText, textToDraw.x, textToDraw.y);
+				});
+
+
 				ctx.font = oldFont;
 			}
 		}
