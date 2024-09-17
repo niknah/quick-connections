@@ -273,7 +273,8 @@ class MapLinks {
 		let linesArea;
 
 		let thisDirection = null;
-		if (lastDirection !== 'horz' && horzDistanceAbs > vertDistanceAbs) {
+		// if (lastDirection !== 'horz' && horzDistanceAbs > vertDistanceAbs) {
+		if (horzDistanceAbs > vertDistanceAbs) {
 			// horz then vert to avoid blocking node
 			blockedNodeId = clippedHorz.node.node.id;
 			// blockedArea = clippedHorz.node.area;
@@ -322,7 +323,8 @@ class MapLinks {
 				lastPathLocation[1] += 1;
 			}
 			thisDirection = 'vert';
-		} else if (lastDirection !== 'vert') {
+		// } else if (lastDirection !== 'vert') {
+		} else {
 			// vert then horz to avoid blocking node
 			blockedNodeId = clippedVert.node.node.id;
 			// blockedArea = clippedVert.node.area;
@@ -372,9 +374,9 @@ class MapLinks {
 				// lastPathLocation[0] += 1; //this.lineSpace;
 			}
 			thisDirection = 'horz';
-		} else {
-			console.log('blocked will not go backwards', outputXY, inputXY); // eslint-disable-line no-console
-			return [outputXY, inputXY];
+//		} else {
+//			console.log('blocked will not go backwards', outputXY, inputXY); // eslint-disable-line no-console
+//			return [outputXY, inputXY];
 		}
 
 		// console.log('is blocked check',isBlocked, blockedNodeId);
@@ -495,8 +497,8 @@ class MapLinks {
 				const outputXYConnection = node.getConnectionPos(false, slot, linkPos);
 				const outputNodeInfo = this.nodesById[node.id];
 				let outputXY = Array.from(outputXYConnection);
-				outputXY[0] = outputNodeInfo.linesArea[2];
 				output.links.filter((linkId) => {
+					outputXY[0] = outputNodeInfo.linesArea[2];
 					const link = this.canvas.graph.links[linkId];
 					if (!link) {
 						return false;
@@ -522,7 +524,7 @@ class MapLinks {
 						this.getNodeOnPos(outputXY);
 
 					let path = null;
-					// console.log('blocked', inputBlockedByNode, outputBlockedByNode, 'inputXY', inputXY);
+					// console.log('blocked', inputBlockedByNode, outputBlockedByNode, 'inputXY', inputXY, 'outputXY', outputXY);
 					if (!inputBlockedByNode && !outputBlockedByNode) {
 						const pathFound = this.mapLink(outputXY, inputXY, nodeInfo, {}, null);
 						if (pathFound && pathFound.length > 2) {
@@ -637,12 +639,21 @@ class MapLinks {
 							afterPos[1] = cornerPos[1] + cornerRadius * ySignAfter;
 						}
 
-						ctx.lineTo(beforePos[0], beforePos[1]);
-						corners.push(cornerPos);
-						// ctx.lineTo(cornerPos[0], cornerPos[1]);
-						// ctx.lineTo(beforePos[0], beforePos[1]);
-						ctx.quadraticCurveTo(cornerPos[0], cornerPos[1], afterPos[0], afterPos[1]);
-						isPrevDotRound = true;
+
+						if (isPrevDotRound
+							&& Math.abs(isPrevDotRound[0] - beforePos[0]) <= cornerRadius
+							&& Math.abs(isPrevDotRound[1] - beforePos[1]) <= cornerRadius
+						) {
+							// if two rounded corners are too close, draw a straight line so it doesn't look funny
+							ctx.lineTo(cornerPos[0], cornerPos[1]);
+							// ctx.lineTo(beforePos[0], beforePos[1]);
+							// ctx.lineTo(afterPos[0], afterPos[1]);
+						} else {
+							ctx.lineTo(beforePos[0], beforePos[1]);
+							corners.push(cornerPos);
+							ctx.quadraticCurveTo(cornerPos[0], cornerPos[1], afterPos[0], afterPos[1]);
+						}
+						isPrevDotRound = beforePos;
 						drawn = true;
 					}
 				}
