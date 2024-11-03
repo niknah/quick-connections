@@ -48,10 +48,12 @@ const ext = {
 			},
 		});
 
-		const circuitBoardId = "circuit-board-lines.enable";
+		const circuitBoardId = "circuit-board-lines";
+		const circuitBoardEnableId = `${circuitBoardId}.enable`;
 		app.ui.settings.addSetting({
-			id: circuitBoardId,
+			id: circuitBoardEnableId,
 			name: "Circuit Board lines",
+			category: [circuitBoardId, "enable"],
 			type: "combo",
 			options: [
 				{ value: 0, text: "Off" },
@@ -65,6 +67,24 @@ const ext = {
 				const option = parseInt(app.ui.settings.getSettingValue(circuitBoardId, 1), 10);
 				circuitBoardLines.enabled = (option === 1);
 				app.graph.config.links_ontop = (option === 2);
+				return app.graph.change.apply(app.graph, args);
+			},
+		});
+
+		const only90or45Id = `${circuitBoardId}.only90or45`;
+		app.ui.settings.addSetting({
+			id: only90or45Id,
+			name: "Prefer 90 or 45 degree lines",
+			category: [circuitBoardId, "enable", "only90or45"],
+			tooltip: "Show mostly 90 or 45 degree lines, normally it'll link directly at any angle if the line if there are no nodes in the way",
+			type: "boolean",
+			defaultValue: true,
+			onChange: (...args) => {
+				circuitBoardLines.maxDirectLineDistance = app.ui.settings.getSettingValue(
+					only90or45Id,
+					true,
+				)
+					? 20 : Number.MAX_SAFE_INTEGER;
 				return app.graph.change.apply(app.graph, args);
 			},
 		});

@@ -25,3 +25,7 @@ python -m http.server
 # visit in browser: http://localhost:8000/example/quick_conn.html
 ```
 
+
+## Changelog
+
+2024-11-03: It defaults to mostly 90 or 45 degree lines now.  This can be changed in the options back to the old way(connect any angle when nothing is blocking).

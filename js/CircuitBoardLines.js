@@ -97,6 +97,7 @@ class MapLinks {
 		this.lastPathId = 10000000;
 		this.paths = [];
 		this.lineSpace = Math.floor(LiteGraph.NODE_SLOT_HEIGHT / 2);
+		this.maxDirectLineDistance = Number.MAX_SAFE_INTEGER;
 		this.debug = false;
 	}
 
@@ -140,13 +141,13 @@ class MapLinks {
 				}
 			}
 		}
-		return closest;
+		return { clipped: closest, closestDistance };
 	}
 
 	testPath(path) {
 		const len1 = (path.length - 1);
 		for (let p = 0; p < len1; ++p) {
-			const clipped = this.findClippedNode(path[p], path[p + 1]);
+			const { clipped } = this.findClippedNode(path[p], path[p + 1]);
 			if (clipped) {
 				return clipped;
 			}
@@ -155,10 +156,13 @@ class MapLinks {
 	}
 
 	mapFinalLink(outputXY, inputXY) {
-		const clipped = this.findClippedNode(outputXY, inputXY);
+		const { clipped } = this.findClippedNode(outputXY, inputXY);
 		if (!clipped) {
-			// direct, nothing blocking us
-			return { path: [outputXY, inputXY] };
+			const dist = Math.sqrt(((outputXY[0] - inputXY[0]) ** 2) + ((outputXY[1] - inputXY[1]) ** 2));
+			if (dist < this.maxDirectLineDistance) {
+				// direct, nothing blocking us
+				return { path: [outputXY, inputXY] };
+			}
 		}
 
 		const horzDistance = inputXY[0] - outputXY[0];
@@ -255,7 +259,7 @@ class MapLinks {
 		};
 	}
 
-	mapLink(outputXY, inputXY, targetNodeInfo, isBlocked, lastDirection) {
+	mapLink(outputXY, inputXY, targetNodeInfo, isBlocked /* , lastDirection */) {
 		const { clippedHorz, clippedVert, path } = this.mapFinalLink(outputXY, inputXY);
 		if (path) {
 			return path;
@@ -353,7 +357,7 @@ class MapLinks {
 
 			lastPathLocation = [
 				horzDistanceViaBlockLeft <= horzDistanceViaBlockRight ?
-					(linesArea[0]-1)
+					(linesArea[0] - 1)
 					: (linesArea[2]),
 				vertEdge,
 			];
@@ -374,9 +378,9 @@ class MapLinks {
 				// lastPathLocation[0] += 1; //this.lineSpace;
 			}
 			thisDirection = 'horz';
-//		} else {
-//			console.log('blocked will not go backwards', outputXY, inputXY); // eslint-disable-line no-console
-//			return [outputXY, inputXY];
+			//		} else {
+			//			console.log('blocked will not go backwards', outputXY, inputXY);
+			//			return [outputXY, inputXY];
 		}
 
 		// console.log('is blocked check',isBlocked, blockedNodeId);
@@ -524,7 +528,8 @@ class MapLinks {
 						this.getNodeOnPos(outputXY);
 
 					let path = null;
-					// console.log('blocked', inputBlockedByNode, outputBlockedByNode, 'inputXY', inputXY, 'outputXY', outputXY);
+					// console.log('blocked', inputBlockedByNode, outputBlockedByNode,
+					//	'inputXY', inputXY, 'outputXY', outputXY);
 					if (!inputBlockedByNode && !outputBlockedByNode) {
 						const pathFound = this.mapLink(outputXY, inputXY, nodeInfo, {}, null);
 						if (pathFound && pathFound.length > 2) {
@@ -639,7 +644,6 @@ class MapLinks {
 							afterPos[1] = cornerPos[1] + cornerRadius * ySignAfter;
 						}
 
-
 						if (isPrevDotRound
 							&& Math.abs(isPrevDotRound[0] - beforePos[0]) <= cornerRadius
 							&& Math.abs(isPrevDotRound[1] - beforePos[1]) <= cornerRadius
@@ -715,6 +719,7 @@ export class CircuitBoardLines {
 		this.canvas = null;
 		this.mapLinks = null;
 		this.enabled = true;
+		this.maxDirectLineDistance = Number.MAX_SAFE_INTEGER;
 	}
 
 	setEnabled(e) { this.enabled = e; }
@@ -766,6 +771,7 @@ export class CircuitBoardLines {
 
 	recalcMapLinks() {
 		this.mapLinks = new MapLinks(this.canvas);
+		this.mapLinks.maxDirectLineDistance = this.maxDirectLineDistance;
 		this.mapLinks.debug = this.debug;
 		const nodesByExecution = this.canvas.graph.computeExecutionOrder() || [];
 		this.mapLinks.mapLinks(nodesByExecution);
