@@ -1,1 +1,3 @@
-example/links/
+# example/links is made by example/run_example.sh
+example/links
+node_modules

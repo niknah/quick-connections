@@ -2,11 +2,11 @@
 	"scripts": {
 		"example": "bash example/run_example.sh",
 		"docs": "bash example/make_docs.sh",
-		"lint": "eslint js/*.js"
+		"lint": "eslint js/*.js example/*quick_conn.js"
 	},
 	"dependencies": {
-		"@comfyorg/litegraph": "^0.7.47",
+		"@comfyorg/litegraph": ">=0.7.47",
 		"eslint-config-airbnb-base": "^15.0.0",
-		"litegraph.js": "^0.7.18"
+		"litegraph.js": ">=0.7.18"
 	}
 }
