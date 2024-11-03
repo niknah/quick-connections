@@ -17,7 +17,7 @@ Adds circuit board connections, quick connections to ComfyUI
 * Can be disabled in options under "Quick connections", "Circuit Board lines"
 
 
-## Can be used with litegraph too.  See example folder.  
+## Can be used with litegraph too.  See example folder(examples won't work in windows because it doesn't support symlinks, use WSL).
 To run examples...
 ```
 npm install
