@@ -233,7 +233,8 @@ export class QuickConnection {
 			const buttonShift = [
 				isInput ? -32 : +32,
 				// force for now so the dots don't move around when the tooltip pops up.
-				// No need to avoid tool tip if we're using the input, tool tip is visible to the right of dot
+				// No need to avoid tool tip if we're using the input,
+				//	tool tip is visible to the right of dot
 				isInput ? 0 : LiteGraph.NODE_SLOT_HEIGHT,
 				/*
 				(true || this.acceptingNodes.length === 1 || hasNodeTooltip)
@@ -322,15 +323,22 @@ export class QuickConnection {
 						boxRect = rRect.slice(0);
 					} else {
 						if (boxRect[0] > rRect[0]) {
+							// eslint-disable-next-line prefer-destructuring
 							boxRect[0] = rRect[0];
 						}
 						if (boxRect[2] < rRect[2]) {
+							// eslint-disable-next-line prefer-destructuring
 							boxRect[2] = rRect[2];
 						}
 						boxRect[3] += rRect[3];
 					}
 
-					textsToDraw.push({x:textxy[0], y:textxy[1], acceptingText, textAlign});
+					textsToDraw.push({
+						x: textxy[0],
+						y: textxy[1],
+						acceptingText,
+						textAlign,
+					});
 
 					let isInsideRect;
 					if (this.connectDotOnly) {
@@ -346,11 +354,11 @@ export class QuickConnection {
 						isInsideRect = LiteGraph.isInsideRectangle(
 							mouseX,
 							mouseY,
-							isInput ? box[0] : (linkPos[0] - (LiteGraph.NODE_SLOT_HEIGHT/2) ),
+							isInput ? box[0] : (linkPos[0] - (LiteGraph.NODE_SLOT_HEIGHT / 2)),
 							linkPos[1] - 10,
 							isInput ?
-								((linkPos[0] - box[0]) + LiteGraph.NODE_SLOT_HEIGHT/2 )
-								: (rRect[2] + LiteGraph.NODE_SLOT_HEIGHT/2 ),
+								((linkPos[0] - box[0]) + LiteGraph.NODE_SLOT_HEIGHT / 2)
+								: (rRect[2] + LiteGraph.NODE_SLOT_HEIGHT / 2),
 							rRect[3],
 						);
 					}
@@ -397,7 +405,6 @@ export class QuickConnection {
 						ctx.closePath();
 					}
 
-
 					linkPos[1] += LiteGraph.NODE_SLOT_HEIGHT * scale;
 					return false;
 				});
@@ -423,8 +430,8 @@ export class QuickConnection {
 				textsToDraw.filter((textToDraw) => {
 					ctx.textAlign = textToDraw.textAlign;
 					ctx.fillText(textToDraw.acceptingText, textToDraw.x, textToDraw.y);
+					return true;
 				});
-
 
 				ctx.font = oldFont;
 			}

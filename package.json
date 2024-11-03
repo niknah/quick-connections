@@ -1,7 +1,8 @@
 {
 	"scripts": {
 		"example": "bash example/run_example.sh",
-		"docs": "bash example/make_docs.sh"
+		"docs": "bash example/make_docs.sh",
+		"lint": "eslint js/*.js"
 	},
 	"dependencies": {
 		"@comfyorg/litegraph": "^0.7.47",
