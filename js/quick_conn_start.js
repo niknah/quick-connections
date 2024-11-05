@@ -64,7 +64,7 @@ const ext = {
 			defaultValue: 1,
 
 			onChange: (...args) => {
-				const option = parseInt(app.ui.settings.getSettingValue(circuitBoardId, 1), 10);
+				const option = parseInt(app.ui.settings.getSettingValue(circuitBoardEnableId, 1), 10);
 				circuitBoardLines.enabled = (option === 1);
 				app.graph.config.links_ontop = (option === 2);
 				return app.graph.change.apply(app.graph, args);
