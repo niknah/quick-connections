@@ -9,16 +9,10 @@ import { CircuitBoardLines } from './CircuitBoardLines.js';
 const quickConnection = new QuickConnection();
 quickConnection.init();
 
-const circuitBoardLines = new CircuitBoardLines();
-circuitBoardLines.init();
-
-const ext = {
+const quickConnectionsExt = {
 	name: "Quick Connections",
-
 	init() {
 		quickConnection.initListeners(app.canvas);
-		circuitBoardLines.initOverrides(app.canvas);
-
 		const quickConnectionId = "quick-connections";
 		const quickConnectionEnableId = `${quickConnectionId}.enable`;
 		app.ui.settings.addSetting({
@@ -47,6 +41,15 @@ const ext = {
 				return app.graph.change.apply(app.graph, args);
 			},
 		});
+	},
+};
+
+const circuitBoardLinesExt = {
+	name: "Circuit Board Lines",
+	init() {
+		const circuitBoardLines = new CircuitBoardLines();
+		circuitBoardLines.init();
+		circuitBoardLines.initOverrides(app.canvas);
 
 		const circuitBoardId = "circuit-board-lines";
 		const circuitBoardEnableId = `${circuitBoardId}.enable`;
@@ -91,4 +94,5 @@ const ext = {
 	},
 };
 
-app.registerExtension(ext);
+app.registerExtension(quickConnectionsExt);
+app.registerExtension(circuitBoardLinesExt);

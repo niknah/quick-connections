@@ -11,7 +11,7 @@
 export class QuickConnection {
 	constructor() {
 		this.insideConnection = null;
-		this.enabled = true;
+		this.enabled = false;
 		// use inputs that already have a link to them.
 		this.useInputsWithLinks = false;
 		this.release_link_on_empty_shows_menu = true;
@@ -54,6 +54,7 @@ export class QuickConnection {
 	}
 
 	initListeners(canvas) {
+		this.enabled = true;
 		this.graph = canvas.graph;
 		this.canvas = canvas;
 		if (!this.canvas.canvas) {
