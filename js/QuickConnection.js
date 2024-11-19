@@ -198,9 +198,6 @@ export class QuickConnection {
 			return;
 		}
 
-		ctx.save();
-		this.canvas.ds.toCanvasContext(ctx);
-
 		this.insideConnection = null;
 
 		const connectionInfo = this.getCurrentConnection();
@@ -209,6 +206,13 @@ export class QuickConnection {
 			const {
 				node, input, output, slot,
 			} = connectionInfo;
+			if (!input && !output) {
+				return;
+			}
+
+			ctx.save();
+			this.canvas.ds.toCanvasContext(ctx);
+
 			const slotPos = new Float32Array(2);
 
 			const isInput = input ? true : false;
