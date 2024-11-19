@@ -440,7 +440,7 @@ export class QuickConnection {
 
 				ctx.font = oldFont;
 			}
-		}
 		ctx.restore();
+		}
 	}
 }
