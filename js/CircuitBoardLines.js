@@ -39,11 +39,11 @@ function clipT(num, denom, c) {
 	return 1;
 }
 /**
- * @param  {Point} a
- * @param  {Point} b
- * @param  {BoundingBox} box [xmin, ymin, xmax, ymax]
- * @param  {Point?} [da]
- * @param  {Point?} [db]
+ * @param	{Point} a
+ * @param	{Point} b
+ * @param	{BoundingBox} box [xmin, ymin, xmax, ymax]
+ * @param	{Point?} [da]
+ * @param	{Point?} [db]
  * @return {number}
  */
 function liangBarsky(a, b, box, da, db) {
@@ -714,15 +714,59 @@ class MapLinks {
 	}
 }
 
+class EyeButton {
+	constructor() {
+		this.hidden = null;
+	}
+
+	static getEyeButton() {
+		const eyeButtons = document.querySelectorAll('.pi-eye,.pi-eye-slash');
+		if (eyeButtons.length > 1) {
+			console.log('found too many eye buttons', eyeButtons); // eslint-disable-line no-console
+		}
+		return eyeButtons[0];
+	}
+
+	check() {
+		const eyeButton = EyeButton.getEyeButton();
+		if (!eyeButton) {
+			return;
+		}
+		const hidden = eyeButton.classList.contains('pi-eye-slash');
+		if (this.hidden !== hidden) {
+			this.hidden = hidden;
+			if (this.onChange) {
+				this.onChange(hidden);
+			}
+		}
+	}
+
+	listenEyeButton(onChange) {
+		this.onChange = onChange;
+		const eyeButton = EyeButton.getEyeButton();
+		if (!eyeButton) {
+			setTimeout(() => this.listenEyeButton(onChange), 1000);
+			return;
+		}
+		const eyeDom = eyeButton.parentNode;
+		eyeDom.addEventListener('click', () => this.check());
+		eyeDom.addEventListener('keyup', () => this.check());
+		eyeDom.addEventListener('mouseup', () => this.check());
+	}
+}
+
 export class CircuitBoardLines {
 	constructor() {
 		this.canvas = null;
 		this.mapLinks = null;
 		this.enabled = true;
+		this.eyeHidden = false;
 		this.maxDirectLineDistance = Number.MAX_SAFE_INTEGER;
 	}
 
 	setEnabled(e) { this.enabled = e; }
+
+	isShow() { return this.enabled && !this.eyeHidden; }
 
 	recalcMapLinksTimeout() {
 		// calculate paths when user is idle...
@@ -798,13 +842,17 @@ export class CircuitBoardLines {
 		LGraphCanvas.prototype.drawConnections = function drawConnections(
 			ctx,
 		) {
-			if (t.canvas && t.enabled) {
+			if (t.canvas && t.isShow()) {
 				return t.drawConnections(
 					ctx,
 				);
 			}
 			return oldDrawConnections.apply(this, arguments);
 		};
+		this.eyeButton = new EyeButton();
+		this.eyeButton.listenEyeButton((hidden) => {
+			this.eyeHidden = hidden;
+		});
 	}
 
 	initOverrides(canvas) {
