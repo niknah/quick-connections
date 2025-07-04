@@ -11,7 +11,7 @@
 export class QuickConnection {
 	constructor() {
 		this.insideConnection = null;
-		this.enabled = true;
+		this.enabled = false;
 		// use inputs that already have a link to them.
 		this.useInputsWithLinks = false;
 		this.release_link_on_empty_shows_menu = true;
@@ -39,13 +39,25 @@ export class QuickConnection {
 
 			// Let's not popup the release on empty spot menu if we've released the mouse on a dot
 			const origReleaseLink = LiteGraph.release_link_on_empty_shows_menu;
+			const origShowConnectionMenu = t.canvas.showConnectionMenu;
 			if (t.pointerUp()) {
-				LiteGraph.release_link_on_empty_shows_menu = false;
+				if (!t.isComfyUI) {
+					LiteGraph.release_link_on_empty_shows_menu = false;
+				} else {
+					t.canvas.showConnectionMenu = () => {};
+				}
 				t.release_link_on_empty_shows_menu = false;
 			}
 			const ret = origProcessMouseUp.apply(this, arguments);
-			LiteGraph.release_link_on_empty_shows_menu = origReleaseLink;
-			t.release_link_on_empty_shows_menu = true;
+			if (!t.release_link_on_empty_shows_menu) {
+				if (!t.isComfyUI) {
+					LiteGraph.release_link_on_empty_shows_menu = origReleaseLink;
+				} else {
+					t.canvas.showConnectionMenu = origShowConnectionMenu;
+					t.canvas.linkConnector.reset();
+				}
+				t.release_link_on_empty_shows_menu = true;
+			}
 			return ret;
 		};
 
@@ -54,6 +66,7 @@ export class QuickConnection {
 	}
 
 	initListeners(canvas) {
+		this.enabled = true;
 		this.graph = canvas.graph;
 		this.canvas = canvas;
 		if (!this.canvas.canvas) {
@@ -197,9 +210,6 @@ export class QuickConnection {
 			return;
 		}
 
-		ctx.save();
-		this.canvas.ds.toCanvasContext(ctx);
-
 		this.insideConnection = null;
 
 		const connectionInfo = this.getCurrentConnection();
@@ -208,6 +218,13 @@ export class QuickConnection {
 			const {
 				node, input, output, slot,
 			} = connectionInfo;
+			if (!input && !output) {
+				return;
+			}
+
+			ctx.save();
+			this.canvas.ds.toCanvasContext(ctx);
+
 			const slotPos = new Float32Array(2);
 
 			const isInput = input ? true : false;
@@ -435,7 +452,7 @@ export class QuickConnection {
 
 				ctx.font = oldFont;
 			}
+			ctx.restore();
 		}
-		ctx.restore();
 	}
 }
