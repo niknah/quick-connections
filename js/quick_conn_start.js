@@ -9,52 +9,55 @@ import { CircuitBoardLines } from './CircuitBoardLines.js';
 const quickConnection = new QuickConnection();
 quickConnection.init();
 
+const quickConnectionId = "quick-connections";
+
 const quickConnectionsExt = {
 	name: "Quick Connections",
-	init() {
-		quickConnection.initListeners(app.canvas);
-		const quickConnectionId = "quick-connections";
-		const quickConnectionEnableId = `${quickConnectionId}.enable`;
-		app.ui.settings.addSetting({
-			id: quickConnectionEnableId,
+	settings: [
+		{
+			id: `${quickConnectionId}.enable`,
 			name: "Quick connections enable",
 			type: "boolean",
 			defaultValue: true,
 			onChange: (...args) => {
-				quickConnection.enabled = app.ui.settings.getSettingValue(quickConnectionEnableId, true);
-				return app.graph.change.apply(app.graph, args);
+				[quickConnection.enabled] = args;
+				if (app?.graph?.change) {
+					return app.graph.change.apply(app.graph, args);
+				}
+				return null;
 			},
-		});
-		const quickConnectionDotOnlyId = `${quickConnectionId}.connectDotOnly`;
-		app.ui.settings.addSetting({
-			id: quickConnectionDotOnlyId,
+		},
+		{
+			id: `${quickConnectionId}.connectDotOnly`,
 			category: [quickConnectionId, "enable", "connectDotOnly"],
 			name: "Connect with dot",
 			tooltip: "Disable to connect with text too, a bigger area to release the mouse button",
 			type: "boolean",
 			defaultValue: true,
 			onChange: (...args) => {
-				quickConnection.connectDotOnly = app.ui.settings.getSettingValue(
-					quickConnectionDotOnlyId,
-					true,
-				);
-				return app.graph.change.apply(app.graph, args);
+				[quickConnection.connectDotOnly] = args;
+				if (app?.graph?.change) {
+					return app.graph.change.apply(app.graph, args);
+				}
+				return null;
 			},
-		});
+		},
+	],
+
+	init() {
+		quickConnection.initListeners(app.canvas);
 	},
 };
 
+const circuitBoardLines = new CircuitBoardLines();
+const circuitBoardId = "circuit-board-lines";
+
 const circuitBoardLinesExt = {
 	name: "Circuit Board Lines",
-	init() {
-		const circuitBoardLines = new CircuitBoardLines();
-		circuitBoardLines.init();
-		circuitBoardLines.initOverrides(app.canvas);
 
-		const circuitBoardId = "circuit-board-lines";
-		const circuitBoardEnableId = `${circuitBoardId}.enable`;
-		app.ui.settings.addSetting({
-			id: circuitBoardEnableId,
+	settings: [
+		{
+			id: `${circuitBoardId}.enable`,
 			name: "Circuit Board lines",
 			category: [circuitBoardId, "enable"],
 			type: "combo",
@@ -67,30 +70,37 @@ const circuitBoardLinesExt = {
 			defaultValue: 1,
 
 			onChange: (...args) => {
-				const option = parseInt(app.ui.settings.getSettingValue(circuitBoardEnableId, 1), 10);
+				const option = args[0];
 				circuitBoardLines.enabled = (option === 1);
-				app.graph.config.links_ontop = (option === 2);
-				return app.graph.change.apply(app.graph, args);
+				if (app.graph) {
+					app.graph.config.links_ontop = (option === 2);
+					return app.graph.change.apply(app.graph, args);
+				}
+				return null;
 			},
-		});
-
-		const only90or45Id = `${circuitBoardId}.only90or45`;
-		app.ui.settings.addSetting({
-			id: only90or45Id,
+		},
+		{
+			id: `${circuitBoardId}.only90or45`,
 			name: "Prefer 90 or 45 degree lines",
 			category: [circuitBoardId, "enable", "only90or45"],
 			tooltip: "Show mostly 90 or 45 degree lines, normally it'll link directly at any angle if the line if there are no nodes in the way",
 			type: "boolean",
 			defaultValue: true,
 			onChange: (...args) => {
-				circuitBoardLines.maxDirectLineDistance = app.ui.settings.getSettingValue(
-					only90or45Id,
-					true,
-				)
+				circuitBoardLines.maxDirectLineDistance = args[0]
 					? 20 : Number.MAX_SAFE_INTEGER;
-				return app.graph.change.apply(app.graph, args);
+
+				if (app.graph) {
+					return app.graph.change.apply(app.graph, args);
+				}
+				return null;
 			},
-		});
+		},
+	],
+
+	init() {
+		circuitBoardLines.init();
+		circuitBoardLines.initOverrides(app.canvas);
 	},
 };
 

@@ -8,6 +8,7 @@ import {
 	LGraph,
 	LiteGraph,
 	LGraphCanvas,
+// eslint-disable-next-line import/no-unresolved
 } from './links/comfyui_litegraph.js';
 import { QuickConnection } from './QuickConnection.js';
 import { CircuitBoardLines } from './CircuitBoardLines.js';
