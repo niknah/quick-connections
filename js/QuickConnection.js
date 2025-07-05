@@ -40,23 +40,28 @@ export class QuickConnection {
 			// Let's not popup the release on empty spot menu if we've released the mouse on a dot
 			const origReleaseLink = LiteGraph.release_link_on_empty_shows_menu;
 			const origShowConnectionMenu = t.canvas.showConnectionMenu;
-			if (t.pointerUp()) {
-				if (!t.isComfyUI) {
-					LiteGraph.release_link_on_empty_shows_menu = false;
-				} else {
-					t.canvas.showConnectionMenu = () => {};
+
+			let ret = null;
+			try {
+				if (t.pointerUp()) {
+					if (!t.isComfyUI) {
+						LiteGraph.release_link_on_empty_shows_menu = false;
+					} else {
+						t.canvas.showConnectionMenu = () => {};
+					}
+					t.release_link_on_empty_shows_menu = false;
 				}
-				t.release_link_on_empty_shows_menu = false;
-			}
-			const ret = origProcessMouseUp.apply(this, arguments);
-			if (!t.release_link_on_empty_shows_menu) {
-				if (!t.isComfyUI) {
-					LiteGraph.release_link_on_empty_shows_menu = origReleaseLink;
-				} else {
-					t.canvas.showConnectionMenu = origShowConnectionMenu;
-					t.canvas.linkConnector.reset();
+				ret = origProcessMouseUp.apply(this, arguments);
+			} finally {
+				if (!t.release_link_on_empty_shows_menu) {
+					if (!t.isComfyUI) {
+						LiteGraph.release_link_on_empty_shows_menu = origReleaseLink;
+					} else {
+						t.canvas.showConnectionMenu = origShowConnectionMenu;
+						t.canvas.linkConnector.reset();
+					}
+					t.release_link_on_empty_shows_menu = true;
 				}
-				t.release_link_on_empty_shows_menu = true;
 			}
 			return ret;
 		};
