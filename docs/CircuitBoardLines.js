@@ -18,6 +18,7 @@
 const EPSILON = 1e-6;
 const INSIDE = 1;
 const OUTSIDE = 0;
+
 function clipT(num, denom, c) {
 	/* eslint-disable one-var,no-param-reassign,prefer-destructuring,operator-linebreak */
 	/* eslint-disable one-var-declaration-per-line,nonblock-statement-body-position,curly */
@@ -828,12 +829,88 @@ export class CircuitBoardLines {
 			return false;
 		}
 
-		this.recalcMapLinksCheck();
+		try {
+			this.recalcMapLinksCheck();
 
-		this.mapLinks.drawLinks(ctx);
-		this.lastDrawConnections = new Date().getTime();
+			this.mapLinks.drawLinks(ctx);
+
+			if (this.canvas.subgraph) {
+				this.drawSubgraphConnections(ctx, this.canvas.graph, this.canvas.subgraph);
+			}
+		} catch(e) {
+			console.error('drawConnections crash', e);
+		} finally {
+			this.lastDrawConnections = new Date().getTime();
+		}
 
 		return true;
+	}
+
+	drawSubgraphConnections(
+		ctx,
+		graph,
+		subgraph,
+	) {
+		for (const output of subgraph.inputNode.slots) { // eslint-disable-line no-restricted-syntax
+			if (!output.linkIds.length) {
+				continue;
+			}
+
+			// find link info
+			for (const linkId of output.linkIds) { // eslint-disable-line no-restricted-syntax
+				const resolved = LiteGraph.LLink.resolve(linkId, graph);
+				if (!resolved) continue;
+
+				const { link, inputNode, input } = resolved;
+				if (!inputNode || !input)
+					continue;
+
+				const endPos = inputNode.getInputPos(link.target_slot);
+
+				const startDir = input.dir || LiteGraph.RIGHT;
+				const endDir = input.dir || LiteGraph.LEFT;
+
+				this.canvas.renderLink(
+					ctx,
+					output.pos,
+					endPos,
+					link,
+					false,
+					0,
+					null,
+					startDir,
+					endDir,
+				);
+			}
+		}
+
+		for (const input of subgraph.outputNode.slots) { // eslint-disable-line no-restricted-syntax
+			if (!input.linkIds.length) continue;
+
+			// find link info
+			const resolved = LiteGraph.LLink.resolve(input.linkIds[0], graph);
+			if (!resolved) continue;
+
+			const { link, outputNode, output } = resolved;
+			if (!outputNode || !output) continue;
+
+			const startPos = outputNode.getOutputPos(link.origin_slot);
+
+			const startDir = output.dir || LiteGraph.RIGHT;
+			const endDir = input.dir || LiteGraph.LEFT;
+
+			this.canvas.renderLink(
+				ctx,
+				startPos,
+				input.pos,
+				link,
+				false,
+				0,
+				null,
+				startDir,
+				endDir,
+			);
+		}
 	}
 
 	init() {

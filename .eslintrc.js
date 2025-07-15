@@ -15,5 +15,7 @@ module.exports = {
 		'no-tabs': 'off',
 		'import/extensions': 'off',
 		'prefer-rest-params': 'off', // allow use of arguments
+		'no-continue': 'off',
+		'no-restricted-syntax': 'off',
 	},
 };

@@ -28,5 +28,6 @@ python -m http.server
 
 ## Changelog
 
+2025-07-15 v1.0.17: Draw connections in subgraph mode.  https://github.com/niknah/quick-connections/issues/24
 2025-07-04 v1.0.16: Problem with the enable/disable toggle not working.  https://github.com/niknah/quick-connections/issues/19
 2024-11-03: It defaults to mostly 90 or 45 degree lines now.  This can be changed in the options back to the old way(connect any angle when nothing is blocking).
