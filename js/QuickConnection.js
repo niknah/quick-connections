@@ -236,7 +236,7 @@ export class QuickConnection {
 			const connecting = isInput ? input : output;
 			const connectionSlot = slot;
 
-			const pos = node.getConnectionPos(isInput, connectionSlot, slotPos);
+			const pos = node.getConnectionPos?.(isInput, connectionSlot, slotPos) ?? node.pos;
 
 			if (!this.acceptingNodes) {
 				this.acceptingNodes = this.findAcceptingNodes(
