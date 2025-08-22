@@ -89,7 +89,13 @@ export class QuickConnection {
 
 		this.isComfyUI = this.canvas.connecting_links !== undefined ? true : false;
 
-		this.addOnCanvas('onDrawOverlay', (ctx) => this.onDrawOverlay(ctx));
+		this.addOnCanvas('onDrawOverlay', (ctx) => {
+			try {
+				this.onDrawOverlay(ctx);
+			} catch (e) {
+				console.error('onDrawOverlayCrash', ctx); // eslint-disable-line no-console
+			}
+		});
 	}
 
 	getCurrentConnection() {
@@ -230,13 +236,15 @@ export class QuickConnection {
 			ctx.save();
 			this.canvas.ds.toCanvasContext(ctx);
 
-			const slotPos = new Float32Array(2);
+			// const slotPos = new Float32Array(2);
 
 			const isInput = input ? true : false;
 			const connecting = isInput ? input : output;
 			const connectionSlot = slot;
 
-			const pos = node.getConnectionPos?.(isInput, connectionSlot, slotPos) ?? node.pos;
+			const pos = isInput ?
+				node.getInputPos(connectionSlot)
+				: node.getOutputPos(connectionSlot);
 
 			if (!this.acceptingNodes) {
 				this.acceptingNodes = this.findAcceptingNodes(
@@ -407,13 +415,19 @@ export class QuickConnection {
 						ctx.lineWidth = 3;
 
 						const aNode = acceptingNode.node;
-						const destPos = new Float32Array(2);
-						aNode.getConnectionPos(!isInput, acceptingNode.connection_slot_index, destPos);
-						ctx.moveTo(pos[0], pos[1]);
+						// const destPos = new Float32Array(2);
+						if (!aNode?.getOutputPos || !aNode.getInputPos) {
+							console.warn('Node has no getInputPos/getOutputPos', aNode); // eslint-disable-line no-console
+						} else {
+							const destPos = isInput ?
+								aNode.getOutputPos(acceptingNode.connection_slot_index)
+								: aNode.getInputPos(acceptingNode.connection_slot_index);
+							ctx.moveTo(pos[0], pos[1]);
 
-						ctx.lineTo(destPos[0], destPos[1]);
-						ctx.stroke();
-						ctx.closePath();
+							ctx.lineTo(destPos[0], destPos[1]);
+							ctx.stroke();
+							ctx.closePath();
+						}
 					} else {
 						const slotColor =
 							this.canvas.default_connection_color_byType[acceptingNode.connection.type]
