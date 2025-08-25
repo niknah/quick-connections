@@ -78,6 +78,10 @@ export class QuickConnection {
 			console.error('no canvas', this.canvas); // eslint-disable-line no-console
 		} else {
 			this.canvas.canvas.addEventListener('litegraph:canvas', (e) => {
+				if (this.canvas?.subgraph) {
+					return;
+				}
+
 				const { detail } = e;
 				if (!this.release_link_on_empty_shows_menu
 					&& detail && detail.subType === 'empty-release'
@@ -218,6 +222,9 @@ export class QuickConnection {
 		}
 		if (!this.canvas || !this.canvas.graph_mouse) {
 			console.error('no canvas or mouse yet', this.canvas); // eslint-disable-line no-console
+			return;
+		}
+		if (this.canvas.subgraph) {
 			return;
 		}
 
