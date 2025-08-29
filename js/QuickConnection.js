@@ -78,10 +78,6 @@ export class QuickConnection {
 			console.error('no canvas', this.canvas); // eslint-disable-line no-console
 		} else {
 			this.canvas.canvas.addEventListener('litegraph:canvas', (e) => {
-				if (this.canvas?.subgraph) {
-					return;
-				}
-
 				const { detail } = e;
 				if (!this.release_link_on_empty_shows_menu
 					&& detail && detail.subType === 'empty-release'
@@ -97,7 +93,7 @@ export class QuickConnection {
 			try {
 				this.onDrawOverlay(ctx);
 			} catch (e) {
-				console.error('onDrawOverlayCrash', ctx); // eslint-disable-line no-console
+				console.error('onDrawOverlayCrash', e, ctx); // eslint-disable-line no-console
 			}
 		});
 	}
@@ -115,6 +111,7 @@ export class QuickConnection {
 					slot: connectingLink.slot,
 					input: connectingLink.input,
 					output: connectingLink.output,
+					pos: connectingLink.pos,
 				};
 			}
 		} else if (this.canvas.connecting_node) {
@@ -139,17 +136,35 @@ export class QuickConnection {
 
 		if (this.insideConnection && connectionInfo) {
 			if (connectionInfo.input) {
-				this.insideConnection.node.connect(
-					this.insideConnection.connection_slot_index,
-					connectionInfo.node,
-					connectionInfo.slot,
-				);
+				if (connectionInfo.node.connect) {
+					this.insideConnection.node.connect(
+						this.insideConnection.connection_slot_index,
+						connectionInfo.node,
+						connectionInfo.slot,
+					);
+				} else {
+					// subgraph
+					connectionInfo.input.connect(
+						this.insideConnection.node.outputs[this.insideConnection.connection_slot_index],
+						this.insideConnection.node,
+					);
+				}
 			} else {
-				connectionInfo.node.connect(
-					connectionInfo.slot,
-					this.insideConnection.node,
-					this.insideConnection.connection_slot_index,
-				);
+				// output
+				// eslint-disable-next-line no-lonely-if
+				if (connectionInfo.node.connect) {
+					connectionInfo.node.connect(
+						connectionInfo.slot,
+						this.insideConnection.node,
+						this.insideConnection.connection_slot_index,
+					);
+				} else {
+					// subgraph
+					connectionInfo.output.connect(
+						this.insideConnection.node.inputs[this.insideConnection.connection_slot_index],
+						this.insideConnection.node,
+					);
+				}
 			}
 			return true;
 		}
@@ -190,7 +205,7 @@ export class QuickConnection {
 			}
 		};
 
-		const nodes = this.graph._nodes;
+		const nodes = this.canvas.subgraph?._nodes || this.graph._nodes;
 		for (let i = 0; i < nodes.length; ++i) {
 			const node = nodes[i];
 			if (node.inputs && findInput) {
@@ -224,9 +239,6 @@ export class QuickConnection {
 			console.error('no canvas or mouse yet', this.canvas); // eslint-disable-line no-console
 			return;
 		}
-		if (this.canvas.subgraph) {
-			return;
-		}
 
 		this.insideConnection = null;
 
@@ -240,19 +252,20 @@ export class QuickConnection {
 				return;
 			}
 
-			ctx.save();
-			this.canvas.ds.toCanvasContext(ctx);
-
 			// const slotPos = new Float32Array(2);
 
 			const isInput = input ? true : false;
 			const connecting = isInput ? input : output;
 			const connectionSlot = slot;
 
-			const pos = isInput ?
-				node.getInputPos(connectionSlot)
-				: node.getOutputPos(connectionSlot);
-
+			let pos;
+			if (!node.getOutputPos || !node.getInputPos) {
+				pos = connectionInfo.pos;
+			} else {
+				pos = isInput ?
+					node.getInputPos(connectionSlot)
+					: node.getOutputPos(connectionSlot);
+			}
 			if (!this.acceptingNodes) {
 				this.acceptingNodes = this.findAcceptingNodes(
 					connecting,
@@ -269,10 +282,8 @@ export class QuickConnection {
 
 			const buttonShift = [
 				isInput ? -32 : +32,
-				// force for now so the dots don't move around when the tooltip pops up.
-				// No need to avoid tool tip if we're using the input,
-				//	tool tip is visible to the right of dot
-				isInput ? 0 : LiteGraph.NODE_SLOT_HEIGHT,
+				// 2025-08-29: tooltip seems to be far away now, don't change position
+				0,
 				/*
 				(true || this.acceptingNodes.length === 1 || hasNodeTooltip)
 					? 0
@@ -312,6 +323,9 @@ export class QuickConnection {
 			);
 			let boxRect = null;
 			const textsToDraw = [];
+
+			ctx.save();
+			this.canvas.ds.toCanvasContext(ctx);
 
 			// const oldFillStyle = ctx.fillStyle;
 			if (isInsideClosePosition) {

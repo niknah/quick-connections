@@ -28,6 +28,7 @@ python -m http.server
 
 ## Changelog
 
+2025-08-29 v1.0.21: Changes to get subgraphs working.
 2025-08-26 v1.0.20: Disable quick-connections in subgraphs, not working.
 2025-08-23 v1.0.19: Possible crashes in subgraph node fix. https://github.com/niknah/quick-connections/issues/25
 2025-07-15 v1.0.17: Draw connections in subgraph mode.  https://github.com/niknah/quick-connections/issues/24
