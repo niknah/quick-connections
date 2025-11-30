@@ -498,8 +498,13 @@ class MapLinks {
 					return false;
 				}
 
-				const linkPos = new Float32Array(2);
-				const outputXYConnection = node.getConnectionPos(false, slot, linkPos);
+				const outputXYConnection =
+					(LiteGraph.vueNodesMode && node.getSlotPosition)
+						? node.getSlotPosition(
+							slot,
+							false,
+						)
+						: node.getOutputPos(slot);
 				const outputNodeInfo = this.nodesById[node.id];
 				let outputXY = Array.from(outputXYConnection);
 				output.links.filter((linkId) => {
@@ -513,12 +518,13 @@ class MapLinks {
 						return false;
 					}
 
-					const inputLinkPos = new Float32Array(2);
-					const inputXYConnection = targetNode.getConnectionPos(
-						true,
-						link.target_slot,
-						inputLinkPos,
-					);
+					const inputXYConnection =
+						(LiteGraph.vueNodesMode && targetNode.getSlotPosition)
+							? targetNode.getSlotPosition(
+								link.target_slot,
+								true,
+							)
+							: targetNode.getInputPos(link.target_slot);
 					const inputXY = Array.from(inputXYConnection);
 					const nodeInfo = this.nodesById[targetNode.id];
 					inputXY[0] = nodeInfo.linesArea[0] - 1;

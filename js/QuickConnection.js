@@ -23,9 +23,44 @@ export class QuickConnection {
 		this.graph_mouse = [0, 0];
 	}
 
-	init() {
-		const origProcessMouseDown = LGraphCanvas.prototype.processMouseDown;
+	mouseUp(origThis, origFunc, args) {
 		const t = this;
+		if (!t.enabled || !t.canvas) {
+			return origFunc.apply(origThis, args);
+		}
+
+		// Let's not popup the release on empty spot menu if we've released the mouse on a dot
+		const origReleaseLink = LiteGraph.release_link_on_empty_shows_menu;
+		const origShowConnectionMenu = t.canvas.showConnectionMenu;
+
+		let ret = null;
+		try {
+			if (t.pointerUp()) {
+				if (!t.isComfyUI) {
+					LiteGraph.release_link_on_empty_shows_menu = false;
+				} else {
+					t.canvas.showConnectionMenu = () => {};
+				}
+				t.release_link_on_empty_shows_menu = false;
+			}
+			ret = origFunc.apply(origThis, args);
+		} finally {
+			if (!t.release_link_on_empty_shows_menu) {
+				if (!t.isComfyUI) {
+					LiteGraph.release_link_on_empty_shows_menu = origReleaseLink;
+				} else {
+					t.canvas.showConnectionMenu = origShowConnectionMenu;
+					t.canvas.linkConnector.reset();
+				}
+				t.release_link_on_empty_shows_menu = true;
+			}
+		}
+		return ret;
+	}
+
+	init() {
+		const t = this;
+		const origProcessMouseDown = LGraphCanvas.prototype.processMouseDown;
 		this.acceptingNodes = null;
 		LGraphCanvas.prototype.processMouseDown = function mouseDown() {
 			t.pointerDown();
@@ -34,45 +69,28 @@ export class QuickConnection {
 		};
 
 		const origProcessMouseUp = LGraphCanvas.prototype.processMouseUp;
-		LGraphCanvas.prototype.processMouseUp = function mouseUp() {
-			if (!t.enabled) {
-				return origProcessMouseUp.apply(this, arguments);
-			}
-
-			// Let's not popup the release on empty spot menu if we've released the mouse on a dot
-			const origReleaseLink = LiteGraph.release_link_on_empty_shows_menu;
-			const origShowConnectionMenu = t.canvas.showConnectionMenu;
-
-			let ret = null;
-			try {
-				if (t.pointerUp()) {
-					if (!t.isComfyUI) {
-						LiteGraph.release_link_on_empty_shows_menu = false;
-					} else {
-						t.canvas.showConnectionMenu = () => {};
-					}
-					t.release_link_on_empty_shows_menu = false;
-				}
-				ret = origProcessMouseUp.apply(this, arguments);
-			} finally {
-				if (!t.release_link_on_empty_shows_menu) {
-					if (!t.isComfyUI) {
-						LiteGraph.release_link_on_empty_shows_menu = origReleaseLink;
-					} else {
-						t.canvas.showConnectionMenu = origShowConnectionMenu;
-						t.canvas.linkConnector.reset();
-					}
-					t.release_link_on_empty_shows_menu = true;
-				}
-			}
-			return ret;
+		LGraphCanvas.prototype.processMouseUp = function newProcessMouseUp() {
+			return t.mouseUp(this, origProcessMouseUp, arguments);
 		};
 
 		// ComfyUI has it's own version of litegraph.js
 		// https://github.com/Comfy-Org/litegraph.js
 	}
 
+	setGraphMouseFromClientXY(clientX, clientY) {
+		if (!this.canvas) {
+			return;
+		}
+		const { offset, scale } = this.canvas.ds;
+		const boundingRect = this.canvas.canvas.getBoundingClientRect();
+		this.graph_mouse = [
+			(clientX - boundingRect.x) / scale - offset[0],
+			(clientY - boundingRect.y) / scale - offset[1],
+		];
+	}
+
 	initListeners(canvas) {
+		const t = this;
 		this.enabled = true;
 		this.graph = canvas.graph;
 		this.canvas = canvas;
@@ -97,6 +115,67 @@ export class QuickConnection {
 			} catch (e) {
 				console.error('onDrawOverlayCrash', e, ctx); // eslint-disable-line no-console
 			}
+		});
+
+		// src/renderer/extensions/vueNodes/composables/useSlotLinkInteraction.ts:onPointerDown
+		// uses useEventListener(..., { capture: true } )
+		// Which stops the mousemove / pointermove event from working.
+		//
+		let origEventsReplacementId = 1;
+		const origEventsReplacement = {};
+		if (LiteGraph.vueNodesMode) {
+			const oldAddEventListener = window.addEventListener;
+			const uncaptureEvents = {
+				pointermove: true,
+				pointerup: true,
+			};
+			// eslint-disable-line no-unused-vars
+			window.addEventListener = function newAddEventListener(name, func, opts) {
+				if (uncaptureEvents[name] && opts?.capture) {
+					const newArgs = Array.from(arguments);
+					const newOpts = { ...opts };
+					newArgs[2] = newOpts;
+					const origEventFunc = newArgs[1];
+					let newFunc = null;
+					if (name === 'pointerup') {
+						newFunc = function newPointerUp() {
+							return t.mouseUp(this, origEventFunc, arguments);
+						};
+					} else if (name === 'pointermove') {
+						newFunc = function newPointerMove(e) {
+							t.setGraphMouseFromClientXY(e.clientX, e.clientY);
+							return origEventFunc.apply(this, arguments);
+						};
+					}
+					if (newFunc) {
+						newArgs[1] = newFunc;
+						origEventFunc.__id = ++origEventsReplacementId;
+						origEventsReplacement[origEventFunc.__id] = newFunc;
+					}
+
+					return oldAddEventListener.apply(window, newArgs);
+				}
+				return oldAddEventListener.apply(window, arguments);
+			};
+			const oldRemoveEventListener = window.removeEventListener;
+			window.removeEventListener = function newRemoveEventListener() {
+				const newArgs = [...arguments];
+				const funcId = arguments[1].__id;
+				if (funcId) {
+					const newEventFunc = origEventsReplacement[funcId];
+					if (!newEventFunc) {
+						console.warn('Could not find replaced event to remove, id:', funcId, arguments); // eslint-disable-line no-console
+					} else {
+						newArgs[1] = newEventFunc;
+					}
+				}
+				return oldRemoveEventListener.apply(window, newArgs);
+			};
+		}
+
+		this.canvas.canvas.addEventListener('pointermove', (e) => {
+			this.graph_mouse[0] = e.canvasX;
+			this.graph_mouse[1] = e.canvasY;
 		});
 	}
 
@@ -240,7 +319,7 @@ export class QuickConnection {
 		if (!this.enabled) {
 			return;
 		}
-		if (!this.canvas || !this.canvas.graph_mouse) {
+		if (!this.canvas) {
 			console.error('no canvas or mouse yet', this.canvas); // eslint-disable-line no-console
 			return;
 		}
@@ -266,6 +345,11 @@ export class QuickConnection {
 			let pos;
 			if (!node.getOutputPos || !node.getInputPos) {
 				pos = connectionInfo.pos;
+			} else if (LiteGraph.vueNodesMode && node.getSlotPosition) {
+				pos = node.getSlotPosition(
+					connectionSlot,
+					isInput,
+				);
 			} else {
 				pos = isInput ?
 					node.getInputPos(connectionSlot)
@@ -280,8 +364,8 @@ export class QuickConnection {
 				);
 			}
 
-			const mouseX = this.canvas.graph_mouse[0];
-			const mouseY = this.canvas.graph_mouse[1];
+			const mouseX = this.graph_mouse[0];
+			const mouseY = this.graph_mouse[1];
 
 			// const hasNodeTooltip = document.querySelector('.node-tooltip');
 
