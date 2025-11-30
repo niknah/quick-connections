@@ -387,7 +387,7 @@ class MapLinks {
 		// console.log('is blocked check',isBlocked, blockedNodeId);
 		if (isBlocked[blockedNodeId] > 3) {
 			// Blocked too many times, let's return the direct path
-			console.log('Too many blocked', outputXY, inputXY); // eslint-disable-line no-console
+			console.log('CircuitBoardLines: Too many blocked, node id:', blockedNodeId, 'output', outputXY, 'input', inputXY); // eslint-disable-line no-console
 			return [outputXY, inputXY];
 		}
 		if (isBlocked[blockedNodeId])

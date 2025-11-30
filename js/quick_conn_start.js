@@ -42,6 +42,20 @@ const quickConnectionsExt = {
 				return null;
 			},
 		},
+		{
+			id: `${quickConnectionId}.maxSuggestions`,
+			category: [quickConnectionId, "enable", "maxSuggestions"],
+			name: "Maximum suggestions for connections",
+			type: "number",
+			defaultValue: 15,
+			onChange: (...args) => {
+				[quickConnection.maxSuggestions] = args;
+				if (app?.graph?.change) {
+					return app.graph.change.apply(app.graph, args);
+				}
+				return null;
+			},
+		},
 	],
 
 	init() {

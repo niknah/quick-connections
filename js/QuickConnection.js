@@ -16,9 +16,11 @@ export class QuickConnection {
 		this.useInputsWithLinks = false;
 		this.release_link_on_empty_shows_menu = true;
 		this.connectDotOnly = true;
+		this.maxSuggestions = 15;
 		this.doNotAcceptType = /^\*$/;
 		this.boxAlpha = 0.7;
 		this.boxBackground = '#000';
+		this.graph_mouse = [0, 0];
 	}
 
 	init() {
@@ -217,6 +219,9 @@ export class QuickConnection {
 		}
 
 		accepting.sort((a, b) => a.node.pos[1] - b.node.pos[1]);
+		if (this.maxSuggestions) {
+			return accepting.slice(0, this.maxSuggestions);
+		}
 		return accepting;
 	}
 
