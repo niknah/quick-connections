@@ -869,7 +869,12 @@ export class CircuitBoardLines {
 				if (!inputNode || !input)
 					continue;
 
-				const endPos = inputNode.getInputPos(link.target_slot);
+				const endPos = (LiteGraph.vueNodesMode && inputNode.getSlotPosition)
+					? inputNode.getSlotPosition(
+						link.target_slot,
+						true,
+					)
+					: inputNode.getInputPos(link.target_slot);
 
 				const startDir = input.dir || LiteGraph.RIGHT;
 				const endDir = input.dir || LiteGraph.LEFT;
@@ -898,7 +903,13 @@ export class CircuitBoardLines {
 			const { link, outputNode, output } = resolved;
 			if (!outputNode || !output) continue;
 
-			const startPos = outputNode.getOutputPos(link.origin_slot);
+			const startPos =
+				(LiteGraph.vueNodesMode && outputNode.getSlotPosition)
+					? outputNode.getSlotPosition(
+						link.origin_slot,
+						false,
+					)
+					: outputNode.getOutputPos(link.origin_slot);
 
 			const startDir = output.dir || LiteGraph.RIGHT;
 			const endDir = input.dir || LiteGraph.LEFT;
