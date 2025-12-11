@@ -753,8 +753,9 @@ class SubgraphSlotProxy {
 }
 
 class SubgraphInOutNodeProxy {
-	constructor(subgraphNode) {
+	constructor(subgraphNode, isInput) {
 		this.subgraphNode = subgraphNode;
+		this.isInput = isInput;
 		this.slots = [];
 		for (const slot of this.subgraphNode.slots) {
 			this.slots.push(new SubgraphSlotProxy(slot));
@@ -766,14 +767,14 @@ class SubgraphInOutNodeProxy {
 	}
 
 	get outputs() {
-		if (this.subgraphNode.id === -20) {
+		if (this.isOutput) {
 			// output node in subgraph has no outputs, only inputs
 			return [];
 		}
 		return this.slots;
 	}
 
-	getSlotPosition(slot /* , isInput */) {
+	getSlotPosition(slot, isInput) {
 		return this.subgraphNode.slots[slot].pos;
 	}
 
@@ -926,11 +927,11 @@ export class CircuitBoardLines {
 		const nodesByExecution = this.canvas.graph.computeExecutionOrder() || [];
 		if (this.canvas.subgraph) {
 			// add subgraph nodes
-			const newInputNode = new SubgraphInOutNodeProxy(this.canvas.subgraph.inputNode);
-			const newOutputNode = new SubgraphInOutNodeProxy(this.canvas.subgraph.outputNode);
+			const proxyInputNode = new SubgraphInOutNodeProxy(this.canvas.subgraph.inputNode, true);
+			const proxyOutputNode = new SubgraphInOutNodeProxy(this.canvas.subgraph.outputNode, false);
 
-			nodesByExecution.push(newInputNode);
-			nodesByExecution.push(newOutputNode);
+			nodesByExecution.push(proxyInputNode);
+			nodesByExecution.push(proxyOutputNode);
 		}
 		try {
 			this.mapLinks.mapLinks(nodesByExecution);
