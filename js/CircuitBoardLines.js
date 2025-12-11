@@ -388,6 +388,7 @@ class MapLinks {
 		if (isBlocked[blockedNodeId] > 3) {
 			// Blocked too many times, let's return the direct path
 			console.log('CircuitBoardLines: Too many blocked, node id:', blockedNodeId, 'output', outputXY, 'input', inputXY); // eslint-disable-line no-console
+			isBlocked.blocked = true;
 			return [outputXY, inputXY];
 		}
 		if (isBlocked[blockedNodeId])
@@ -552,8 +553,10 @@ class MapLinks {
 					// console.log('blocked', inputBlockedByNode, outputBlockedByNode,
 					//	'inputXY', inputXY, 'outputXY', outputXY);
 					if (!inputBlockedByNode && !outputBlockedByNode) {
-						const pathFound = this.mapLink(outputXY, inputXY, nodeInfo, {}, null);
-						if (pathFound && pathFound.length > 2) {
+						const isBlocked = {};
+						const pathFound = this.mapLink(outputXY, inputXY, nodeInfo, isBlocked, null);
+						// Draw a direct line when it's blocked (isBlocked.blocked)
+						if (!isBlocked.blocked && pathFound && pathFound.length > 2) {
 							// mapLink() may have expanded the linesArea,
 							// lets put it back into the inputXY so the line is straight
 							path = [outputXYConnection, ...pathFound, inputXYConnection];
