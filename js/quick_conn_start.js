@@ -79,7 +79,7 @@ const circuitBoardLinesExt = {
 				{ value: 0, text: "Off" },
 				{ value: 1, text: "Circuit board" },
 				// On top doesn't place the wires on top of the text boxes
-				{ value: 2, text: "On top" },
+				{ value: 2, text: "On top (Does not work in nodes v2)" },
 			],
 			defaultValue: 1,
 
@@ -88,7 +88,12 @@ const circuitBoardLinesExt = {
 				circuitBoardLines.enabled = (option === 1);
 				if (app.graph) {
 					app.graph.config.links_ontop = (option === 2);
+					if (app.canvas?.graph?.config) {
+						app.canvas.graph.config.links_ontop = (option === 2);
+					}
 					return app.graph.change.apply(app.graph, args);
+				} else {
+					console.error('app.graph not available');
 				}
 				return null;
 			},
