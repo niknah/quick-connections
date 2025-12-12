@@ -767,7 +767,7 @@ class SubgraphInOutNodeProxy {
 	}
 
 	get outputs() {
-		if (this.isOutput) {
+		if (!this.isInput) {
 			// output node in subgraph has no outputs, only inputs
 			return [];
 		}
