@@ -556,6 +556,21 @@ class MapLinks {
 					if (!inputBlockedByNode && !outputBlockedByNode) {
 						const isBlocked = {};
 						const pathFound = this.mapLink(outputXY, inputXY, nodeInfo, isBlocked, null);
+
+						if (pathFound) {
+							// remove duplicate dot at the end
+							while (pathFound.length >= 2) {
+								const lastPathPoint1 = pathFound[pathFound.length - 1];
+								const lastPathPoint2 = pathFound[pathFound.length - 2];
+								if (lastPathPoint1[0] === lastPathPoint2[0]
+									&& lastPathPoint1[1] === lastPathPoint2[1]
+								) {
+									pathFound.pop();
+								} else {
+									break;
+								}
+							}
+						}
 						// Draw a direct line when it's blocked (isBlocked.blocked)
 						if (!isBlocked.blocked && pathFound && pathFound.length > 2) {
 							// mapLink() may have expanded the linesArea,
