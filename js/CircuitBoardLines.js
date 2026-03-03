@@ -473,10 +473,11 @@ class MapLinks {
 				barea[1] + barea[3],
 			];
 			const linesArea = Array.from(area);
-			linesArea[0] -= 5;
-			linesArea[1] -= 1;
-			linesArea[2] += 3;
-			linesArea[3] += 3;
+			// new layout needs more spacing
+			linesArea[0] -= 8;
+			linesArea[1] -= 4;
+			linesArea[2] += 12;
+			linesArea[3] += 4;
 			const obj = {
 				node,
 				area,
