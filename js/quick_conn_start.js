@@ -92,9 +92,9 @@ const circuitBoardLinesExt = {
 						app.canvas.graph.config.links_ontop = (option === 2);
 					}
 					return app.graph.change.apply(app.graph, args);
-				} else {
-					console.error('app.graph not available');
 				}
+				// eslint-disable-next-line no-console
+				console.error('app.graph not available');
 				return null;
 			},
 		},

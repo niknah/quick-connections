@@ -790,7 +790,7 @@ class SubgraphInOutNodeProxy {
 		return this.slots;
 	}
 
-	getSlotPosition(slot, isInput) {
+	getSlotPosition(slot /* , isInput */) {
 		return this.subgraphNode.slots[slot].pos;
 	}
 
