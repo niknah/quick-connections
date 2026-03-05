@@ -40,6 +40,7 @@ function clipT(num, denom, c) {
 	return 1;
 }
 /**
+ * Check if a line is going over a box(node)
  * @param	{Point} a
  * @param	{Point} b
  * @param	{BoundingBox} box [xmin, ymin, xmax, ymax]
@@ -451,6 +452,7 @@ class MapLinks {
 		return null;
 	}
 
+	// Find out how to draw the links
 	mapLinks(nodesByExecution) {
 		const graphLinks = this.canvas.graph.links;
 		if (!graphLinks) {
@@ -808,32 +810,6 @@ class SubgraphInOutNodeProxy {
 		area[2] = this.subgraphNode.boundingRect[2];
 		area[3] = this.subgraphNode.boundingRect[3];
 		return area;
-
-		/*
-		let xLeft = 0;
-		let yTop = Number.MAX_VALUE;
-		let yBottom = -Number.MAX_VALUE;
-
-		for (const output of this.subgraphNode.slots) { // eslint-disable-line no-restricted-syntax
-			const [x, y] = output.pos;
-console.log('outputpos', this.id, output.pos, x, y );
-			const yt = y - 100;
-			const yb = y + 100;
-			if (yt < yTop) {
-				yTop = yt;
-			}
-			if (yb > yBottom) {
-				yBottom = yb;
-			}
-			xLeft = x;
-		}
-		area[0] = xLeft;
-		area[1] = yTop;
-		area[2] = 100;
-		area[3] = yBottom - yTop;
-console.log('area', this.id, area, 'slots', this.subgraphNode.slots, 'topy', yTop, yBottom );
-		return area;
-*/
 	}
 }
 
@@ -968,95 +944,12 @@ export class CircuitBoardLines {
 
 			this.mapLinks.drawLinks(ctx);
 
-			//			if (this.canvas.subgraph) {
-			//				this.drawSubgraphConnections(ctx, this.canvas.graph, this.canvas.subgraph);
-			//			}
 		} finally {
 			this.lastDrawConnections = new Date().getTime();
 		}
 
 		return true;
 	}
-
-	/*
-	drawSubgraphConnections(
-		ctx,
-		graph,
-		subgraph,
-	) {
-		for (const output of subgraph.inputNode.slots) { // eslint-disable-line no-restricted-syntax
-			if (!output.linkIds.length) {
-				continue;
-			}
-
-			// find link info
-			for (const linkId of output.linkIds) { // eslint-disable-line no-restricted-syntax
-				const resolved = LiteGraph.LLink.resolve(linkId, graph);
-				if (!resolved) continue;
-
-				const { link, inputNode, input } = resolved;
-				if (!inputNode || !input)
-					continue;
-
-				const endPos = (LiteGraph.vueNodesMode && inputNode.getSlotPosition)
-					? inputNode.getSlotPosition(
-						link.target_slot,
-						true,
-					)
-					: inputNode.getInputPos(link.target_slot);
-
-				const startDir = input.dir || LiteGraph.RIGHT;
-				const endDir = input.dir || LiteGraph.LEFT;
-
-				this.canvas.renderLink(
-					ctx,
-					output.pos,
-					endPos,
-					link,
-					false,
-					0,
-					null,
-					startDir,
-					endDir,
-				);
-			}
-		}
-
-		for (const input of subgraph.outputNode.slots) { // eslint-disable-line no-restricted-syntax
-			if (!input.linkIds.length) continue;
-
-			// find link info
-			const resolved = LiteGraph.LLink.resolve(input.linkIds[0], graph);
-			if (!resolved) continue;
-
-			const { link, outputNode, output } = resolved;
-			if (!outputNode || !output) continue;
-
-			const startPos =
-				(LiteGraph.vueNodesMode && outputNode.getSlotPosition)
-					? outputNode.getSlotPosition(
-						link.origin_slot,
-						false,
-					)
-					: outputNode.getOutputPos(link.origin_slot);
-
-			const startDir = output.dir || LiteGraph.RIGHT;
-			const endDir = input.dir || LiteGraph.LEFT;
-
-			this.canvas.renderLink(
-				ctx,
-				startPos,
-				input.pos,
-				link,
-				false,
-				0,
-				null,
-				startDir,
-				endDir,
-			);
-		}
-	}
-	*/
 
 	init() {
 		const oldDrawConnections = LGraphCanvas.prototype.drawConnections;
@@ -1075,9 +968,5 @@ export class CircuitBoardLines {
 		this.eyeButton.listenEyeButton((hidden) => {
 			this.eyeHidden = hidden;
 		});
-	}
-
-	initOverrides(canvas) {
-		this.canvas = canvas;
 	}
 }
