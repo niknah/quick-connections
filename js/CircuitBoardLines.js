@@ -969,4 +969,9 @@ export class CircuitBoardLines {
 			this.eyeHidden = hidden;
 		});
 	}
+
+	initOverrides(canvas) {
+		this.canvas = canvas;
+	}
 }
+
