@@ -693,10 +693,8 @@ class MapLinks {
 							&& Math.abs(isPrevDotRound[0] - beforePos[0]) <= cornerRadius
 							&& Math.abs(isPrevDotRound[1] - beforePos[1]) <= cornerRadius
 						) {
-							// if two rounded corners are too close, draw a straight line so it doesn't look funny
-							ctx.lineTo(cornerPos[0], cornerPos[1]);
-							// ctx.lineTo(beforePos[0], beforePos[1]);
-							// ctx.lineTo(afterPos[0], afterPos[1]);
+//							// if two rounded corners are too close, don't draw anything
+//							ctx.lineTo(cornerPos[0], cornerPos[1]);
 						} else {
 							ctx.lineTo(beforePos[0], beforePos[1]);
 							corners.push(cornerPos);
