@@ -113,6 +113,7 @@ class MapLinks {
 		return null;
 	}
 
+	// find which node is in the way of the output to input line.
 	findClippedNode(outputXY, inputXY) {
 		let closestDistance = Number.MAX_SAFE_INTEGER;
 		let closest = null;
@@ -407,6 +408,7 @@ class MapLinks {
 		return [...pathAvoidNode, lastPathLocation, ...nextPath.slice(1)];
 	}
 
+	// expand the area around a node that we should not draw on
 	expandSourceNodeLinesArea(sourceNodeInfo, path) {
 		if (path.length < 3) {
 			return false;
@@ -437,6 +439,7 @@ class MapLinks {
 		return true;
 	}
 
+	// get the node on this x,y spot
 	getNodeOnPos(xy) {
 		for (let i = 0; i < this.nodesByRight.length; ++i) {
 			const nodeI = this.nodesByRight[i];
@@ -614,6 +617,7 @@ class MapLinks {
 		// this.lastCalcTime = 250;
 	}
 
+	// draw the links calculated from mapLinks()
 	drawLinks(ctx) {
 		if (!this.canvas.default_connection_color_byType || !this.canvas.default_connection_color) {
 			console.error('Missing canvas.default_connection_color_byType', this.canvas); // eslint-disable-line no-console

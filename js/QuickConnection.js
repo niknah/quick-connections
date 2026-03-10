@@ -179,6 +179,7 @@ export class QuickConnection {
 		});
 	}
 
+	// Get the current connection that we are dragging
 	getCurrentConnection() {
 		if (this.isComfyUI) {
 			const connectingLink =
@@ -252,6 +253,7 @@ export class QuickConnection {
 		return false;
 	}
 
+	// Find the list of nodes we can drag to
 	findAcceptingNodes(fromConnection, fromNode, findInput) {
 		const accepting = [];
 		if (this.doNotAcceptType.exec(fromConnection.type)) {
@@ -418,6 +420,8 @@ export class QuickConnection {
 
 			// const oldFillStyle = ctx.fillStyle;
 			if (isInsideClosePosition) {
+				// We are inside the spot next to the node
+				//  where we can release the mouse and connect to something
 				const oldFont = ctx.font;
 				let font = oldFont;
 				const fontM = /([0-9]+)px/.exec(font);
