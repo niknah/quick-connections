@@ -28,6 +28,7 @@ python -m http.server
 
 ## Changelog
 
+2026-03-10 v1.0.25: Missing round corners some times.  Funny line when two nodes are close together.
 2025-08-29 v1.0.21: Changes to get subgraphs working.
 2025-08-26 v1.0.20: Disable quick-connections in subgraphs, not working.
 2025-08-23 v1.0.19: Possible crashes in subgraph node fix. https://github.com/niknah/quick-connections/issues/25
