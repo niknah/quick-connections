@@ -867,7 +867,13 @@ export class CircuitBoardLines {
 
 	setEnabled(e) { this.enabled = e; }
 
-	isShow() { return this.enabled && !this.eyeHidden; }
+	isShow() { 
+		return 
+			this.enabled &&
+			!this.eyeHidden &&
+			(app?.canvas?.links_render_mode >= 0)
+		;
+	}
 
 	recalcMapLinksTimeout() {
 		// calculate paths when user is idle...

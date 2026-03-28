@@ -28,10 +28,11 @@ python -m http.server
 
 ## Changelog
 
-2026-03-10 v1.0.25: Missing round corners some times.  Funny line when two nodes are close together.
-2025-08-29 v1.0.21: Changes to get subgraphs working.
-2025-08-26 v1.0.20: Disable quick-connections in subgraphs, not working.
-2025-08-23 v1.0.19: Possible crashes in subgraph node fix. https://github.com/niknah/quick-connections/issues/25
-2025-07-15 v1.0.17: Draw connections in subgraph mode.  https://github.com/niknah/quick-connections/issues/24
-2025-07-04 v1.0.16: Problem with the enable/disable toggle not working.  https://github.com/niknah/quick-connections/issues/19
-2024-11-03: It defaults to mostly 90 or 45 degree lines now.  This can be changed in the options back to the old way(connect any angle when nothing is blocking).
+* 2026-03-28 v1.0.26: Fix for show/hide links button not working [#31]
+* 2026-03-10 v1.0.25: Missing round corners some times.  Funny line when two nodes are close together.
+* 2025-08-29 v1.0.21: Changes to get subgraphs working.
+* 2025-08-26 v1.0.20: Disable quick-connections in subgraphs, not working.
+* 2025-08-23 v1.0.19: Possible crashes in subgraph node fix. https://github.com/niknah/quick-connections/issues/25
+* 2025-07-15 v1.0.17: Draw connections in subgraph mode.  https://github.com/niknah/quick-connections/issues/24
+* 2025-07-04 v1.0.16: Problem with the enable/disable toggle not working.  https://github.com/niknah/quick-connections/issues/19
+* 2024-11-03: It defaults to mostly 90 or 45 degree lines now.  This can be changed in the options back to the old way(connect any angle when nothing is blocking).
