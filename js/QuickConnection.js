@@ -133,24 +133,29 @@ export class QuickConnection {
 			window.addEventListener = function newAddEventListener(name, func, opts) {
 				if (uncaptureEvents[name] && opts?.capture) {
 					const newArgs = Array.from(arguments);
-					const newOpts = { ...opts };
-					newArgs[2] = newOpts;
-					const origEventFunc = newArgs[1];
-					let newFunc = null;
-					if (name === 'pointerup') {
-						newFunc = function newPointerUp() {
-							return t.mouseUp(this, origEventFunc, arguments);
-						};
-					} else if (name === 'pointermove') {
-						newFunc = function newPointerMove(e) {
-							t.setGraphMouseFromClientXY(e.clientX, e.clientY);
-							return origEventFunc.apply(this, arguments);
-						};
-					}
-					if (newFunc) {
-						newArgs[1] = newFunc;
-						origEventFunc.__id = ++origEventsReplacementId;
-						origEventsReplacement[origEventFunc.__id] = newFunc;
+					try {
+						const newOpts = { ...opts };
+						newArgs[2] = newOpts;
+						const origEventFunc = newArgs[1];
+						let newFunc = null;
+						if (name === 'pointerup') {
+							newFunc = function newPointerUp() {
+								return t.mouseUp(this, origEventFunc, arguments);
+							};
+						} else if (name === 'pointermove') {
+							newFunc = function newPointerMove(e) {
+								t.setGraphMouseFromClientXY(e.clientX, e.clientY);
+								return origEventFunc.apply(this, arguments);
+							};
+						}
+						if (newFunc) {
+							newArgs[1] = newFunc;
+							origEventFunc.__id = ++origEventsReplacementId;
+							origEventsReplacement[origEventFunc.__id] = newFunc;
+						}
+					} catch(e) {
+						console.error('QuickConnections.newAddEventListener crash');
+						console.error(e);
 					}
 
 					return oldAddEventListener.apply(window, newArgs);
@@ -160,14 +165,19 @@ export class QuickConnection {
 			const oldRemoveEventListener = window.removeEventListener;
 			window.removeEventListener = function newRemoveEventListener() {
 				const newArgs = [...arguments];
-				const funcId = arguments[1].__id;
-				if (funcId) {
-					const newEventFunc = origEventsReplacement[funcId];
-					if (!newEventFunc) {
-						console.warn('Could not find replaced event to remove, id:', funcId, arguments); // eslint-disable-line no-console
-					} else {
-						newArgs[1] = newEventFunc;
+				try {
+					const funcId = arguments[1].__id;
+					if (funcId) {
+						const newEventFunc = origEventsReplacement[funcId];
+						if (!newEventFunc) {
+							console.warn('Could not find replaced event to remove, id:', funcId, arguments); // eslint-disable-line no-console
+						} else {
+							newArgs[1] = newEventFunc;
+						}
 					}
+				} catch(e) {
+					console.error('QuickConnections.newAddEventListener crash');
+					console.error(e);
 				}
 				return oldRemoveEventListener.apply(window, newArgs);
 			};

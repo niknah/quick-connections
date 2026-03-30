@@ -871,7 +871,7 @@ export class CircuitBoardLines {
 		return (
 			!!this.enabled &&
 			!this.eyeHidden &&
-			(app?.canvas?.links_render_mode >= 0)
+			(window?.app?.canvas?.links_render_mode >= 0)
 		);
 	}
 
@@ -965,10 +965,15 @@ export class CircuitBoardLines {
 		LGraphCanvas.prototype.drawConnections = function drawConnections(
 			ctx,
 		) {
-			if (t.canvas && t.isShow()) {
-				return t.drawConnections(
-					ctx,
-				);
+			try {
+				if (t.canvas && t.isShow()) {
+					return t.drawConnections(
+						ctx,
+					);
+				}
+			} catch(e) {
+				console.error("CircuitBoardLines.drawConnections Crash");
+				console.error(e);
 			}
 			return oldDrawConnections.apply(this, arguments);
 		};
