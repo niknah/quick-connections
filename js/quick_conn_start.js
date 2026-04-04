@@ -1,7 +1,8 @@
 /* eslint quotes:0 */
 /* eslint prefer-spread:0 */
+/* global LiteGraph */
+/* eslint operator-linebreak:0 */
 
-// eslint-disable-next-line import/no-unresolved
 import { app } from "../../scripts/app.js";
 import { QuickConnection } from "./QuickConnection.js";
 import { CircuitBoardLines } from './CircuitBoardLines.js';

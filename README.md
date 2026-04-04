@@ -28,6 +28,8 @@ python -m http.server
 
 ## Changelog
 
+* 2026-04-04 v1.0.29: Added adjustable numbers for line / node spacing
+* 2026-03-30 v1.0.27: Catch errors and continue, so we don't stop any other things that are supposed to happen [#31]
 * 2026-03-28 v1.0.26: Fix for show/hide links button not working [#31]
 * 2026-03-10 v1.0.25: Missing round corners some times.  Funny line when two nodes are close together.
 * 2025-08-29 v1.0.21: Changes to get subgraphs working.

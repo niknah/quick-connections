@@ -2,7 +2,6 @@
 /* global LGraph */
 /* global LiteGraph */
 /* eslint camelcase:0 */
-/* eslint import/extensions: [0, {  <js>: "always"  }] */
 
 import { QuickConnection } from './QuickConnection.js';
 import { CircuitBoardLines } from './CircuitBoardLines.js';

@@ -1,4 +1,5 @@
 {
+	"type": "module",
 	"scripts": {
 		"example": "bash example/run_example.sh",
 		"docs": "bash example/make_docs.sh",
@@ -6,7 +7,10 @@
 	},
 	"dependencies": {
 		"@comfyorg/litegraph": ">=0.7.47",
-		"eslint-config-airbnb-base": "^15.0.0",
 		"litegraph.js": ">=0.7.18"
+	},
+	"devDependencies": {
+		"@eslint/js": "^10.0.1",
+		"eslint": "^10.2.0"
 	}
 }

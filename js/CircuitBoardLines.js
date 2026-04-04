@@ -1,7 +1,6 @@
 /* eslint max-classes-per-file: 0 */
 /* eslint no-tabs: 0 */
 /* eslint no-underscore-dangle:0 */
-/* eslint import/prefer-default-export:0 */
 /* eslint prefer-rest-params:0 */
 /* eslint curly:0 */
 /* eslint no-plusplus:0 */
@@ -20,8 +19,6 @@ const INSIDE = 1;
 const OUTSIDE = 0;
 
 function clipT(num, denom, c) {
-	/* eslint-disable one-var,no-param-reassign,prefer-destructuring,operator-linebreak */
-	/* eslint-disable one-var-declaration-per-line,nonblock-statement-body-position,curly */
 	const tE = c[0], tL = c[1];
 	if (Math.abs(denom) < EPSILON)
 		return num < 0;
@@ -49,8 +46,6 @@ function clipT(num, denom, c) {
  * @return {number}
  */
 function liangBarsky(a, b, box, da, db) {
-	/* eslint-disable one-var,no-param-reassign,prefer-destructuring,operator-linebreak */
-	/* eslint-disable one-var-declaration-per-line */
 	const x1 = a[0], y1 = a[1];
 	const x2 = b[0], y2 = b[1];
 	const dx = x2 - x1;
@@ -389,7 +384,7 @@ class MapLinks {
 		// console.log('is blocked check',isBlocked, blockedNodeId);
 		if (isBlocked[blockedNodeId] > 3) {
 			// Blocked too many times, let's return the direct path
-			console.log('CircuitBoardLines: Too many blocked, node id:', blockedNodeId, 'output', outputXY, 'input', inputXY); // eslint-disable-line no-console
+			console.log('CircuitBoardLines: Too many blocked, node id:', blockedNodeId, 'output', outputXY, 'input', inputXY);
 			isBlocked.blocked = true;
 			return [outputXY, inputXY];
 		}
@@ -459,7 +454,7 @@ class MapLinks {
 	mapLinks(nodesByExecution) {
 		const graphLinks = this.canvas.graph.links;
 		if (!graphLinks) {
-			console.error('Missing graph.links', this.canvas.graph); // eslint-disable-line no-console
+			console.error('Missing graph.links', this.canvas.graph);
 			return;
 		}
 
@@ -611,7 +606,7 @@ class MapLinks {
 		}
 
 		if (this.debug)
-			console.log('last calc time', this.lastCalcTime); // eslint-disable-line no-console
+			console.log('last calc time', this.lastCalcTime);
 		// console.log('nodesbyright', this.nodesByRight);
 		// Uncomment this to test timeout on draws
 		// this.lastCalcTime = 250;
@@ -620,11 +615,11 @@ class MapLinks {
 	// draw the links calculated from mapLinks()
 	drawLinks(ctx) {
 		if (!this.canvas.default_connection_color_byType || !this.canvas.default_connection_color) {
-			console.error('Missing canvas.default_connection_color_byType', this.canvas); // eslint-disable-line no-console
+			console.error('Missing canvas.default_connection_color_byType', this.canvas);
 			return;
 		}
 		if (this.debug)
-			console.log('paths', this.paths); // eslint-disable-line no-console
+			console.log('paths', this.paths);
 
 		ctx.save();
 		const currentNodeIds = this.canvas.selected_nodes || {};
@@ -823,7 +818,7 @@ class EyeButton {
 	static getEyeButton() {
 		const eyeButtons = document.querySelectorAll('.pi-eye,.pi-eye-slash');
 		if (eyeButtons.length > 1) {
-			console.log('found too many eye buttons', eyeButtons); // eslint-disable-line no-console
+			console.log('found too many eye buttons', eyeButtons);
 		}
 		return eyeButtons[0];
 	}
@@ -917,7 +912,7 @@ export class CircuitBoardLines {
 		this.lastDrawTimeout = setTimeout(() => {
 			this.lastDrawTimeout = null;
 			window.requestAnimationFrame(() => {
-				console.log('redraw timeout'); // eslint-disable-line no-console
+				console.log('redraw timeout');
 				this.canvas.setDirty(true, true);
 				this.skipNextRecalcTimeout = true;
 				this.canvas.draw(true, true);
@@ -952,7 +947,7 @@ export class CircuitBoardLines {
 		try {
 			this.mapLinks.mapLinks(nodesByExecution);
 		} catch (e) {
-			console.error('mapLinks error', e); // eslint-disable-line no-console
+			console.error('mapLinks error', e);
 		}
 	}
 

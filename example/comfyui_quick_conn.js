@@ -1,5 +1,4 @@
 /* eslint camelcase:0 */
-/* eslint import/extensions: [0, {  <js>: 'always'  }] */
 /* eslint no-else-return:0 */
 /* eslint max-classes-per-file:0 */
 
@@ -8,7 +7,6 @@ import {
 	LGraph,
 	LiteGraph,
 	LGraphCanvas,
-// eslint-disable-next-line import/no-unresolved
 } from './links/comfyui_litegraph.js';
 import { QuickConnection } from './QuickConnection.js';
 import { CircuitBoardLines } from './CircuitBoardLines.js';
@@ -51,7 +49,6 @@ window.LGraphCanvas = LGraphCanvas;
 				return o.toFixed(3);
 			} else if (o.constructor === Array) {
 				let str = '[';
-				// eslint-disable-next-line no-plusplus
 				for (let i = 0; i < o.length; ++i) {
 					str += this.toString(o[i]) + (i + 1 !== o.length ? ',' : '');
 				}

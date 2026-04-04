@@ -1,5 +1,4 @@
 /* eslint no-tabs: 0 */
-/* eslint import/prefer-default-export:0 */
 /* eslint no-underscore-dangle:0 */
 /* eslint no-plusplus:0 */
 /* eslint prefer-rest-params:0 */
@@ -95,7 +94,7 @@ export class QuickConnection {
 		this.graph = canvas.graph;
 		this.canvas = canvas;
 		if (!this.canvas.canvas) {
-			console.error('no canvas', this.canvas); // eslint-disable-line no-console
+			console.error('no canvas', this.canvas);
 		} else {
 			this.canvas.canvas.addEventListener('litegraph:canvas', (e) => {
 				const { detail } = e;
@@ -113,7 +112,7 @@ export class QuickConnection {
 			try {
 				this.onDrawOverlay(ctx);
 			} catch (e) {
-				console.error('onDrawOverlayCrash', e, ctx); // eslint-disable-line no-console
+				console.error('onDrawOverlayCrash', e, ctx);
 			}
 		});
 
@@ -129,7 +128,6 @@ export class QuickConnection {
 				pointermove: true,
 				pointerup: true,
 			};
-			// eslint-disable-line no-unused-vars
 			window.addEventListener = function newAddEventListener(name, func, opts) {
 				if (uncaptureEvents[name] && opts?.capture) {
 					const newArgs = Array.from(arguments);
@@ -153,7 +151,7 @@ export class QuickConnection {
 							origEventFunc.__id = ++origEventsReplacementId;
 							origEventsReplacement[origEventFunc.__id] = newFunc;
 						}
-					} catch(e) {
+					} catch (e) {
 						console.error('QuickConnections.newAddEventListener crash');
 						console.error(e);
 					}
@@ -170,12 +168,12 @@ export class QuickConnection {
 					if (funcId) {
 						const newEventFunc = origEventsReplacement[funcId];
 						if (!newEventFunc) {
-							console.warn('Could not find replaced event to remove, id:', funcId, arguments); // eslint-disable-line no-console
+							console.warn('Could not find replaced event to remove, id:', funcId, arguments);
 						} else {
 							newArgs[1] = newEventFunc;
 						}
 					}
-				} catch(e) {
+				} catch (e) {
 					console.error('QuickConnections.newAddEventListener crash');
 					console.error(e);
 				}
@@ -243,7 +241,6 @@ export class QuickConnection {
 				}
 			} else {
 				// output
-				// eslint-disable-next-line no-lonely-if
 				if (connectionInfo.node.connect) {
 					connectionInfo.node.connect(
 						connectionInfo.slot,
@@ -271,7 +268,6 @@ export class QuickConnection {
 			return accepting;
 		}
 		const addToAccepting = (arr, node) => {
-			// eslint-disable-next-line eqeqeq
 			if (node.mode == 4) {
 				// bypassed
 				return;
@@ -332,7 +328,7 @@ export class QuickConnection {
 			return;
 		}
 		if (!this.canvas) {
-			console.error('no canvas or mouse yet', this.canvas); // eslint-disable-line no-console
+			console.error('no canvas or mouse yet', this.canvas);
 			return;
 		}
 
@@ -477,11 +473,9 @@ export class QuickConnection {
 						boxRect = rRect.slice(0);
 					} else {
 						if (boxRect[0] > rRect[0]) {
-							// eslint-disable-next-line prefer-destructuring
 							boxRect[0] = rRect[0];
 						}
 						if (boxRect[2] < rRect[2]) {
-							// eslint-disable-next-line prefer-destructuring
 							boxRect[2] = rRect[2];
 						}
 						boxRect[3] += rRect[3];
@@ -541,7 +535,7 @@ export class QuickConnection {
 						const aNode = acceptingNode.node;
 						// const destPos = new Float32Array(2);
 						if (!aNode?.getOutputPos || !aNode.getInputPos) {
-							console.warn('Node has no getInputPos/getOutputPos', aNode); // eslint-disable-line no-console
+							console.warn('Node has no getInputPos/getOutputPos', aNode);
 						} else {
 							const destPos = isInput ?
 								aNode.getOutputPos(acceptingNode.connection_slot_index)
