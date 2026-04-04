@@ -92,13 +92,13 @@ function liangBarsky(a, b, box, da, db) {
 }
 
 class MapLinks {
-	constructor(canvas) {
+	constructor(canvas, config) {
 		this.canvas = canvas;
 		this.nodesByRight = [];
 		this.nodesById = [];
 		this.lastPathId = 10000000;
 		this.paths = [];
-		this.lineSpace = Math.floor(LiteGraph.NODE_SLOT_HEIGHT / 2);
+		this.config = config;
 		this.maxDirectLineDistance = Number.MAX_SAFE_INTEGER;
 		this.debug = false;
 	}
@@ -295,9 +295,9 @@ class MapLinks {
 			];
 
 			if (horzDistance <= 0) {
-				linesArea[2] += this.lineSpace;
+				linesArea[2] += this.config.lineSpace;
 			} else {
-				linesArea[0] -= this.lineSpace;
+				linesArea[0] -= this.config.lineSpace;
 			}
 
 			const vertDistanceViaBlockTop =
@@ -323,10 +323,10 @@ class MapLinks {
 				];
 			}
 			if (lastPathLocation[1] < outputXY[1]) {
-				linesArea[1] -= this.lineSpace;
+				linesArea[1] -= this.config.lineSpace;
 				lastPathLocation[1] -= 1;
 			} else {
-				linesArea[3] += this.lineSpace;
+				linesArea[3] += this.config.lineSpace;
 				lastPathLocation[1] += 1;
 			}
 			thisDirection = 'vert';
@@ -346,9 +346,9 @@ class MapLinks {
 				[outputXY[0], vertEdge],
 			];
 			if (vertDistance <= 0) {
-				linesArea[3] += this.lineSpace;
+				linesArea[3] += this.config.lineSpace;
 			} else {
-				linesArea[1] -= this.lineSpace;
+				linesArea[1] -= this.config.lineSpace;
 			}
 
 			const horzDistanceViaBlockLeft =
@@ -374,10 +374,10 @@ class MapLinks {
 				];
 			}
 			if (lastPathLocation[0] < outputXY[0]) {
-				linesArea[0] -= this.lineSpace;
+				linesArea[0] -= this.config.lineSpace;
 				// lastPathLocation[0] -= 1; //this.lineSpace;
 			} else {
-				linesArea[2] += this.lineSpace;
+				linesArea[2] += this.config.lineSpace;
 				// lastPathLocation[0] += 1; //this.lineSpace;
 			}
 			thisDirection = 'horz';
@@ -418,7 +418,7 @@ class MapLinks {
 		if (path[1][0] === path[2][0]) {
 			// first link is going vertical
 			// while (path[1][0] > linesArea[2])
-			linesArea[2] += this.lineSpace;
+			linesArea[2] += this.config.lineSpace;
 		}
 		return true;
 	}
@@ -434,7 +434,7 @@ class MapLinks {
 		if (path[path2Len - 1][0] === path[path2Len][0]) {
 			// first link is going vertical
 			// while (path[path2Len][0] < linesArea[0])
-			linesArea[0] -= this.lineSpace;
+			linesArea[0] -= this.config.lineSpace;
 		}
 		return true;
 	}
@@ -479,10 +479,10 @@ class MapLinks {
 			];
 			const linesArea = Array.from(area);
 			// new layout needs more spacing
-			linesArea[0] -= 8;
-			linesArea[1] -= 4;
-			linesArea[2] += 12;
-			linesArea[3] += 4;
+			linesArea[0] += this.config.nodeSpace[0];
+			linesArea[1] += this.config.nodeSpace[1];
+			linesArea[2] += this.config.nodeSpace[2];
+			linesArea[3] += this.config.nodeSpace[3];
 			const obj = {
 				node,
 				area,
@@ -595,7 +595,7 @@ class MapLinks {
 						slot,
 					});
 					outputXY = [
-						outputXY[0] + this.lineSpace,
+						outputXY[0] + this.config.lineSpace,
 						outputXY[1],
 					];
 					return false;
@@ -646,7 +646,7 @@ class MapLinks {
 				ctx.strokeStyle = slotColor;
 			}
 			ctx.lineWidth = 3;
-			const cornerRadius = this.lineSpace;
+			const cornerRadius = this.config.lineSpace;
 
 			let isPrevDotRound = false;
 			for (let p = 0; p < path.length; ++p) {
@@ -863,6 +863,22 @@ export class CircuitBoardLines {
 		this.enabled = true;
 		this.eyeHidden = false;
 		this.maxDirectLineDistance = Number.MAX_SAFE_INTEGER;
+		this.config = {
+			lineSpace : Math.floor(LiteGraph.NODE_SLOT_HEIGHT / 2),
+			nodeSpace : [-8, -4, 12, 4],
+		};
+	}
+
+	static cleanFloat(n, def) {
+		n = parseFloat(n);
+		if(isNaN(n)) {
+			n = def;
+		}
+		return n;
+	}
+
+	static cleanInteger(n, def) {
+		return Math.round(CircuitBoardLines.cleanFloat(n, def));
 	}
 
 	setEnabled(e) { this.enabled = e; }
@@ -921,7 +937,7 @@ export class CircuitBoardLines {
 	}
 
 	recalcMapLinks() {
-		this.mapLinks = new MapLinks(this.canvas);
+		this.mapLinks = new MapLinks(this.canvas, this.config);
 		this.mapLinks.maxDirectLineDistance = this.maxDirectLineDistance;
 		this.mapLinks.debug = this.debug;
 		const nodesByExecution = this.canvas.graph.computeExecutionOrder() || [];

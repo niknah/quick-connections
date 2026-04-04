@@ -65,6 +65,11 @@ const quickConnectionsExt = {
 
 const circuitBoardLines = new CircuitBoardLines();
 const circuitBoardId = "circuit-board-lines";
+const defaultConfig = {
+	nodeSpace: [-8, -4, 12, 4],
+	lineSpace: Math.floor(LiteGraph.NODE_SLOT_HEIGHT / 2),
+};
+
 
 const circuitBoardLinesExt = {
 	name: "Circuit Board Lines",
@@ -73,7 +78,7 @@ const circuitBoardLinesExt = {
 		{
 			id: `${circuitBoardId}.enable`,
 			name: "Circuit Board lines",
-			category: [circuitBoardId, "enable"],
+			category: [circuitBoardId, "enable", "enable"],
 			type: "combo",
 			options: [
 				{ value: 0, text: "Off" },
@@ -93,8 +98,93 @@ const circuitBoardLinesExt = {
 					}
 					return app.graph.change.apply(app.graph, args);
 				}
-				// eslint-disable-next-line no-console
 				console.error('app.graph not available');
+				return null;
+			},
+		},
+		{
+			id: `${circuitBoardId}.spacing-left`,
+			name: "Node spacing left",
+			category: [circuitBoardId, "spacing","left"],
+			tooltip: "Spacing between line and left of node",
+			type: "number",
+			// 8,4,12,4
+			defaultValue: defaultConfig.nodeSpace[0],
+			onChange: (...args) => {
+				circuitBoardLines.config.nodeSpace[0] =
+					CircuitBoardLines.cleanInteger(args[0], defaultConfig.nodeSpace[0]);
+
+				if (app.graph) {
+					return app.graph.change.apply(app.graph, args);
+				}
+				return null;
+			},
+		},
+		{
+			id: `${circuitBoardId}.spacing-top`,
+			name: "Node spacing top",
+			category: [circuitBoardId, "spacing","top"],
+			tooltip: "Spacing between line and top of node",
+			type: "number",
+			// 8,4,12,4
+			defaultValue: defaultConfig.nodeSpace[1],
+			onChange: (...args) => {
+				circuitBoardLines.config.nodeSpace[1] =
+					CircuitBoardLines.cleanInteger(args[0], defaultConfig.nodeSpace[1]);
+
+				if (app.graph) {
+					return app.graph.change.apply(app.graph, args);
+				}
+				return null;
+			},
+		},
+		{
+			id: `${circuitBoardId}.spacing-right`,
+			name: "Node spacing right",
+			category: [circuitBoardId, "spacing","right"],
+			tooltip: "Spacing between line and right of node",
+			type: "number",
+			defaultValue: defaultConfig.nodeSpace[2],
+			onChange: (...args) => {
+				circuitBoardLines.config.nodeSpace[2] =
+					CircuitBoardLines.cleanInteger(args[0], defaultConfig.nodeSpace[2]);
+
+				if (app.graph) {
+					return app.graph.change.apply(app.graph, args);
+				}
+				return null;
+			},
+		},
+		{
+			id: `${circuitBoardId}.spacingbottom`,
+			name: "Node spacing bottom",
+			category: [circuitBoardId, "spacing","bottom"],
+			tooltip: "Spacing between line and bottom of node",
+			type: "number",
+			defaultValue: defaultConfig.nodeSpace[3],
+			onChange: (...args) => {
+				circuitBoardLines.config.nodeSpace[3] =
+					CircuitBoardLines.cleanInteger(args[0], defaultConfig.nodeSpace[3]);
+
+				if (app.graph) {
+					return app.graph.change.apply(app.graph, args);
+				}
+				return null;
+			},
+		},
+		{
+			id: `${circuitBoardId}.spacing-line`,
+			name: "Line spacing",
+			category: [circuitBoardId, "spacing", "lines"],
+			tooltip: "Spacing between lines",
+			type: "number",
+			defaultValue: defaultConfig.lineSpace,
+			onChange: (...args) => {
+				circuitBoardLines.config.lineSpace =
+						CircuitBoardLines.cleanInteger(args[0], defaultConfig.lineSpace)
+				if (app.graph) {
+					return app.graph.change.apply(app.graph, args);
+				}
 				return null;
 			},
 		},
