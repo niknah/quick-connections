@@ -11,4 +11,4 @@ Repository = "https://github.com/niknah/quick-connections"
 [tool.comfy]
 PublisherId = "niknah"
 DisplayName = "quick-connections"
-Icon = ""
+Icon = "https://raw.githubusercontent.com/niknah/quick-connections/refs/heads/main/CircuitBoard_Icon.webp"
